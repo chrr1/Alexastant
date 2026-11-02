@@ -166,6 +166,42 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ],
   };
 
+  // Tugas yang jatuh tempo (disinkronkan dari halaman Tasks)
+  final List<Map<String, dynamic>> _dueTasks = [
+    {
+      'id': 't1',
+      'title': 'Kirim Laporan Progres Praktikum Jarkom',
+      'workspace': 'Proyek Kuliah',
+      'priority': 'Tinggi',
+      'isDone': false,
+      'dueDay': 4,
+    },
+    {
+      'id': 't2',
+      'title': 'Selesaikan Bab 3 Analisis Algoritma',
+      'workspace': 'Proyek Kuliah',
+      'priority': 'Sedang',
+      'isDone': true,
+      'dueDay': 4,
+    },
+    {
+      'id': 't3',
+      'title': 'Review PR Mockup Alexa Mobile',
+      'workspace': 'Tugas Harian',
+      'priority': 'Urgent',
+      'isDone': false,
+      'dueDay': 2,
+    },
+    {
+      'id': 't4',
+      'title': 'Push Commit Supabase Schema RLS',
+      'workspace': 'Tugas Harian',
+      'priority': 'Sedang',
+      'isDone': false,
+      'dueDay': 5,
+    },
+  ];
+
   final List<Map<String, dynamic>> _weekDays = [
     {'num': '3', 'day': 'Tue'},
     {'num': '4', 'day': 'Wed'},
@@ -672,7 +708,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                     SizedBox(width: 3),
                     Text(
-                      'Tambah',
+                      '+ Jadwal',
                       style: TextStyle(
                         fontSize: 11,
                         color: AppColors.primaryOrangeLight,
@@ -724,7 +760,166 @@ class _CalendarScreenState extends State<CalendarScreen> {
           )
         else
           ...events.map((event) => _buildDayEventCard(event)),
+        const SizedBox(height: 18),
+        _buildDueTasksSection(),
       ],
+    );
+  }
+
+  // ─── Section Integrasi: Tugas Jatuh Tempo Hari Ini ─────────────────────────
+  Widget _buildDueTasksSection() {
+    final tasksForToday = _dueTasks.where((t) => t['dueDay'] == _selectedDay).toList();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryOrange.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.assignment_turned_in_rounded,
+                      color: AppColors.primaryOrange,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Tugas Jatuh Tempo Hari Ini',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        'Terhubung dari Halaman Tasks',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if (tasksForToday.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryOrange.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${tasksForToday.where((t) => t['isDone'] == true).length}/${tasksForToday.length} Selesai',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryOrange,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (tasksForToday.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: const [
+                  Icon(Icons.check_circle_outline_rounded,
+                      color: AppColors.success, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'Tidak ada deadline tugas pada tanggal ini.',
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...tasksForToday.map((task) {
+              final isDone = task['isDone'] as bool;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    task['isDone'] = !isDone;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDone
+                          ? AppColors.cardBorder.withOpacity(0.5)
+                          : AppColors.cardBorder,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isDone
+                            ? Icons.check_circle_rounded
+                            : Icons.radio_button_unchecked_rounded,
+                        color: isDone ? AppColors.success : AppColors.textSecondary,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          task['title'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isDone ? AppColors.textMuted : AppColors.textPrimary,
+                            decoration: isDone ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          task['workspace'] as String,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+        ],
+      ),
     );
   }
 
@@ -1267,7 +1462,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Icon(Icons.add_rounded, color: Colors.white, size: 20),
             SizedBox(width: 6),
             Text(
-              'New Task / Jadwal',
+              'Tambah Jadwal',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
