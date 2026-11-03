@@ -1,69 +1,139 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
-class NewTaskFormScreen extends StatefulWidget {
-  final Function(Map<String, dynamic>)? onTaskCreated;
+class NewEventFormScreen extends StatefulWidget {
+  final Function(Map<String, dynamic>)? onEventCreated;
 
-  const NewTaskFormScreen({super.key, this.onTaskCreated});
+  const NewEventFormScreen({super.key, this.onEventCreated});
 
   @override
-  State<NewTaskFormScreen> createState() => _NewTaskFormScreenState();
+  State<NewEventFormScreen> createState() => _NewEventFormScreenState();
 }
 
-class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
+// Backward compatibility alias
+typedef NewTaskFormScreen = NewEventFormScreen;
+
+class _NewEventFormScreenState extends State<NewEventFormScreen> {
   final TextEditingController _titleController =
-      TextEditingController(text: 'Task Planner Mobile Apps');
-  final TextEditingController _descController = TextEditingController(
-    text:
-        'Task Planner apps with simple and modern style which is like in the references, after that need to post on Dribbble at 2.50PM, but remember after done making the design always consult first to your supervisor.',
+      TextEditingController(text: 'Kuliah Pemrograman Mobile');
+  final TextEditingController _locationController =
+      TextEditingController(text: 'Lab Komputer 302, Gedung B');
+  final TextEditingController _notesController = TextEditingController(
+    text: 'Membahas state management Flutter & integrasi API lokal.',
   );
 
-  String _dueDate = '22 May';
-  String _endDate = '04 June';
-  String _dailyTimeline = '10.00 - 12.00 (2h)';
-  String _selectedWorkspace = 'Proyek Kuliah';
+  DateTime _selectedDate = DateTime(2026, 6, 22);
+  TimeOfDay _startTime = const TimeOfDay(hour: 10, minute: 0);
+  TimeOfDay _endTime = const TimeOfDay(hour: 12, minute: 0);
+  String _selectedCategory = 'Perkuliahan';
 
-  final List<String> _workspaces = [
-    'Proyek Kuliah',
-    'Tugas Harian',
-    'Shared Workspace',
-    'Private Workspace',
-    'Mick Task Project',
+  final List<String> _categories = [
+    'Perkuliahan',
+    'Rapat Kampus',
+    'Praktikum',
+    'Seminar / Webinar',
+    'Pribadi',
   ];
 
   @override
   void dispose() {
     _titleController.dispose();
-    _descController.dispose();
+    _locationController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
-  void _submitTask() {
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2025),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.primaryOrange,
+              surface: AppColors.surface,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  Future<void> _pickTime({required bool isStart}) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: isStart ? _startTime : _endTime,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.primaryOrange,
+              surface: AppColors.surface,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _startTime = picked;
+        } else {
+          _endTime = picked;
+        }
+      });
+    }
+  }
+
+  void _submitEvent() {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Judul jadwal/tugas tidak boleh kosong'),
-          backgroundColor: AppColors.primaryOrange,
+          content: Text('Judul jadwal / kegiatan tidak boleh kosong'),
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
     }
 
-    final taskData = {
-      'title': _titleController.text,
-      'description': _descController.text,
-      'dueDate': _dueDate,
-      'endDate': _endDate,
-      'dailyTimeline': _dailyTimeline,
-      'workspace': _selectedWorkspace,
+    final eventData = {
+      'title': _titleController.text.trim(),
+      'date': _formatDate(_selectedDate),
+      'startTime': _formatTime(_startTime),
+      'endTime': _formatTime(_endTime),
+      'location': _locationController.text.trim(),
+      'category': _selectedCategory,
+      'notes': _notesController.text.trim(),
     };
 
-    widget.onTaskCreated?.call(taskData);
+    widget.onEventCreated?.call(eventData);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Jadwal baru berhasil dibuat secara manual!'),
-        backgroundColor: AppColors.primaryOrange,
+        content: Text('Jadwal baru berhasil ditambahkan ke kalender! ✓'),
+        backgroundColor: AppColors.success,
       ),
     );
 
@@ -77,7 +147,7 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Top App Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -88,17 +158,14 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const Text(
-                    'New Task',
+                    'Tambah Jadwal / Kegiatan',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  _buildCircleButton(
-                    icon: Icons.more_horiz_rounded,
-                    onTap: () {},
-                  ),
+                  const SizedBox(width: 40),
                 ],
               ),
             ),
@@ -111,36 +178,118 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Kategori Kegiatan Chip Picker
+                    _buildLabel('Kategori Kegiatan'),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _categories.map((cat) {
+                          final isSelected = cat == _selectedCategory;
+                          return GestureDetector(
+                            onTap: () => setState(() => _selectedCategory = cat),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.primaryOrange : AppColors.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primaryOrange : AppColors.cardBorder,
+                                ),
+                              ),
+                              child: Text(
+                                cat,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
                     // Title Field
-                    _buildLabel('Tittle'),
+                    _buildLabel('Judul Jadwal / Mata Kuliah'),
                     _buildTextField(
                       controller: _titleController,
-                      hint: 'Enter task title...',
+                      hint: 'Contoh: Kuliah Basis Data / Rapat Himpunan...',
+                      icon: Icons.event_note_rounded,
                     ),
 
                     const SizedBox(height: 18),
 
-                    // Description Field
-                    _buildLabel('Description'),
-                    _buildTextField(
-                      controller: _descController,
-                      hint: 'Enter task description...',
-                      maxLines: 5,
+                    // Tanggal Agenda
+                    _buildLabel('Tanggal'),
+                    GestureDetector(
+                      onTap: _pickDate,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.cardBorder),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_month_rounded,
+                                color: AppColors.primaryOrange, size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              _formatDate(_selectedDate),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(Icons.arrow_drop_down_rounded,
+                                color: AppColors.textSecondary),
+                          ],
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 18),
 
-                    // Due date & End date row
+                    // Waktu Mulai & Selesai
                     Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('Due date'),
-                              _buildDatePickerBox(
-                                value: _dueDate,
-                                onTap: () => _pickDate(true),
+                              _buildLabel('Jam Mulai'),
+                              GestureDetector(
+                                onTap: () => _pickTime(isStart: true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: AppColors.cardBorder),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.access_time_filled_rounded,
+                                          color: AppColors.primaryOrange, size: 18),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formatTime(_startTime),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -150,10 +299,32 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('End date'),
-                              _buildDatePickerBox(
-                                value: _endDate,
-                                onTap: () => _pickDate(false),
+                              _buildLabel('Jam Selesai'),
+                              GestureDetector(
+                                onTap: () => _pickTime(isStart: false),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: AppColors.cardBorder),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.timelapse_rounded,
+                                          color: AppColors.textSecondary, size: 18),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formatTime(_endTime),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -163,15 +334,24 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
 
                     const SizedBox(height: 18),
 
-                    // Daily timeline
-                    _buildLabel('Daily timeline'),
-                    _buildTimelinePickerBox(),
+                    // Lokasi / Ruangan Kuliah
+                    _buildLabel('Lokasi / Ruangan Kuliah'),
+                    _buildTextField(
+                      controller: _locationController,
+                      hint: 'Contoh: Ruang Lab 301, Gedung B atau Google Meet',
+                      icon: Icons.location_on_rounded,
+                    ),
 
                     const SizedBox(height: 18),
 
-                    // Workspace Dropdown
-                    _buildLabel('Workspace'),
-                    _buildWorkspaceDropdown(),
+                    // Catatan / Deskripsi Tambahan
+                    _buildLabel('Catatan Tambahan (Opsional)'),
+                    _buildTextField(
+                      controller: _notesController,
+                      hint: 'Materi yang akan dibahas, link Zoom, atau perlengkapan...',
+                      maxLines: 3,
+                      icon: Icons.notes_rounded,
+                    ),
 
                     const SizedBox(height: 30),
                   ],
@@ -186,7 +366,7 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _submitTask,
+                  onPressed: _submitEvent,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryOrange,
                     shape: RoundedRectangleBorder(
@@ -196,9 +376,9 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
                     shadowColor: AppColors.primaryOrangeGlow,
                   ),
                   child: const Text(
-                    'Create',
+                    'Simpan Jadwal',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -218,9 +398,9 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: AppColors.textSecondary,
         ),
       ),
     );
@@ -229,180 +409,40 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
+    IconData? icon,
     int maxLines = 1,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.cardBorder),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
         style: const TextStyle(
-          color: AppColors.textPrimary,
           fontSize: 13,
-          height: 1.45,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
         ),
         decoration: InputDecoration(
+          prefixIcon: icon != null
+              ? Icon(icon, color: AppColors.primaryOrange, size: 20)
+              : null,
           hintText: hint,
           hintStyle: const TextStyle(
-            color: AppColors.textMuted,
             fontSize: 13,
+            color: AppColors.textMuted,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDatePickerBox({
-    required String value,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.cardBorder),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const Icon(
-              Icons.calendar_today_rounded,
-              color: AppColors.textSecondary,
-              size: 18,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimelinePickerBox() {
-    return GestureDetector(
-      onTap: () {
-        // Toggle time range
-      },
-      child: Container(
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.cardBorder),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              _dailyTimeline,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const Icon(
-              Icons.access_time_rounded,
-              color: AppColors.textSecondary,
-              size: 18,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWorkspaceDropdown() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedWorkspace,
-          dropdownColor: AppColors.surfaceSecondary,
-          isExpanded: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: AppColors.textSecondary,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
           ),
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 13,
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: FontWeight.w500,
-          ),
-          items: _workspaces.map((ws) {
-            return DropdownMenuItem<String>(
-              value: ws,
-              child: Text(ws),
-            );
-          }).toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _selectedWorkspace = val);
-            }
-          },
         ),
       ),
     );
-  }
-
-  void _pickDate(bool isDue) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primaryOrange,
-              surface: AppColors.surface,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      final months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June',
-        'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-      ];
-      final formatted = '${picked.day} ${months[picked.month - 1]}';
-      setState(() {
-        if (isDue) {
-          _dueDate = formatted;
-        } else {
-          _endDate = formatted;
-        }
-      });
-    }
   }
 
   Widget _buildCircleButton({
@@ -412,20 +452,19 @@ class _NewTaskFormScreenState extends State<NewTaskFormScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 44,
-        height: 44,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          shape: BoxShape.circle,
           border: Border.all(color: AppColors.cardBorder),
         ),
         child: Icon(
           icon,
+          size: 16,
           color: AppColors.textPrimary,
-          size: 18,
         ),
       ),
     );
   }
 }
-
