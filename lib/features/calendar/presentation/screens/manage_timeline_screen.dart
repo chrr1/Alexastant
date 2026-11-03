@@ -252,13 +252,13 @@ class _ManageTimelineScreenState extends State<ManageTimelineScreen> {
                             ),
                           ),
 
-                          // Event Block 3: Proyek Kuliah (Teal/Dark)
+                          // Event Block 3: Kuliah (Teal/Dark)
                           Positioned(
                             top: 205,
                             left: 50,
                             right: 15,
                             child: _buildTimelineBlock(
-                              title: 'Proyek Kuliah',
+                              title: 'Kuliah',
                               subtitle: '00:48 h of 5 h | Schedule : 2-14 June',
                               accentColor: const Color(0xFF30D158),
                             ),
@@ -306,7 +306,7 @@ class _ManageTimelineScreenState extends State<ManageTimelineScreen> {
                     shadowColor: AppColors.primaryOrangeGlow,
                   ),
                   child: const Text(
-                    'Create New Task',
+                    'Tambah Jadwal / Kegiatan',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
