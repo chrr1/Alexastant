@@ -171,7 +171,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     {
       'id': 't1',
       'title': 'Kirim Laporan Progres Praktikum Jarkom',
-      'workspace': 'Proyek Kuliah',
+      'workspace': 'Kuliah',
+      'matkul': 'Jaringan Komputer',
       'priority': 'Tinggi',
       'isDone': false,
       'dueDay': 4,
@@ -179,7 +180,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     {
       'id': 't2',
       'title': 'Selesaikan Bab 3 Analisis Algoritma',
-      'workspace': 'Proyek Kuliah',
+      'workspace': 'Kuliah',
+      'matkul': 'Struktur Data',
       'priority': 'Sedang',
       'isDone': true,
       'dueDay': 4,
@@ -905,11 +907,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          task['workspace'] as String,
-                          style: const TextStyle(
+                          task['matkul'] != null
+                              ? '📚 ${task['matkul']}'
+                              : task['workspace'] as String,
+                          style: TextStyle(
                             fontSize: 9,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
+                            color: task['matkul'] != null
+                                ? AppColors.primaryOrange
+                                : AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -1170,7 +1176,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Proyek Kuliah',
+                  'Kuliah',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 8),
@@ -1229,7 +1235,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 const SizedBox(height: 8),
                 _buildWhiteCheckItem('Tugas Harian'),
                 const SizedBox(height: 6),
-                _buildWhiteCheckItem('Proyek Kuliah'),
+                _buildWhiteCheckItem('Kuliah'),
                 const SizedBox(height: 16),
                 const Text('Private Workspace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
                 const SizedBox(height: 8),
