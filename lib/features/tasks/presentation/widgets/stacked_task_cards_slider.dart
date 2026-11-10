@@ -35,8 +35,9 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
   late AnimationController _animController;
   Animation<double>? _animOffset;
 
-  // Tinggi kartu yang seragam agar elemen di bawahnya (kalender) tidak naik-turun
-  static const double _cardHeight = 310.0;
+  // Tinggi kartu yang seragam agar elemen di bawahnya (kalender) tidak naik-turun.
+  // Disesuaikan agar seluruh konten (deskripsi lengkap & semua subtasks) tampil lega tanpa terpotong (...).
+  static const double _cardHeight = 440.0;
 
   @override
   void initState() {
@@ -132,9 +133,10 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
         ? widget.tasks[(_currentIndex + 1) % widget.tasks.length]
         : null;
 
-    // Wadah dengan tinggi tetap + ruang 18px di atas untuk preview kartu yang mengintip
+    // Wadah dengan tinggi tetap + ruang minimalis 10px di atas untuk preview kartu yang mengintip
+    const double headroom = 10.0;
     return SizedBox(
-      height: _cardHeight + 20, // 20px headroom untuk kartu yang mengintip
+      height: _cardHeight + headroom,
       child: GestureDetector(
         onHorizontalDragStart: _onDragStart,
         onHorizontalDragUpdate: _onDragUpdate,
@@ -147,10 +149,10 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
             final rotationAngle = (dragOffset / 900.0).clamp(-0.14, 0.14);
 
             // Kartu belakang bertransformasi mulus:
-            // Scale: 0.93 -> 1.0
-            // Offset Y: dari -16px (mengintip di atas) -> 0px
-            final backCardScale = 0.93 + (0.07 * dragRatio);
-            final backCardOffsetY = -16.0 * (1.0 - dragRatio);
+            // Scale: 0.95 -> 1.0
+            // Offset Y: dari -10px (mengintip rapat di atas) -> 0px
+            final backCardScale = 0.95 + (0.05 * dragRatio);
+            final backCardOffsetY = -headroom * (1.0 - dragRatio);
             final backCardOpacity = (0.75 + (0.25 * dragRatio)).clamp(0.0, 1.0);
 
             return Stack(
@@ -163,17 +165,19 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: Transform.translate(
-                      offset: Offset(0, backCardOffsetY),
-                      child: Transform.scale(
-                        scale: backCardScale,
-                        child: Opacity(
-                          opacity: backCardOpacity,
-                          child: IgnorePointer(
-                            child: _buildFullTaskCard(
-                              task: nextTask,
-                              isFront: false,
-                              taskIndex: (_currentIndex + 1) % widget.tasks.length,
+                    child: RepaintBoundary(
+                      child: Transform.translate(
+                        offset: Offset(0, backCardOffsetY),
+                        child: Transform.scale(
+                          scale: backCardScale,
+                          child: Opacity(
+                            opacity: backCardOpacity,
+                            child: IgnorePointer(
+                              child: _buildFullTaskCard(
+                                task: nextTask,
+                                isFront: false,
+                                taskIndex: (_currentIndex + 1) % widget.tasks.length,
+                              ),
                             ),
                           ),
                         ),
@@ -186,14 +190,16 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Transform.translate(
-                    offset: Offset(dragOffset, 0),
-                    child: Transform.rotate(
-                      angle: rotationAngle,
-                      child: _buildFullTaskCard(
-                        task: currentTask,
-                        isFront: true,
-                        taskIndex: _currentIndex % widget.tasks.length,
+                  child: RepaintBoundary(
+                    child: Transform.translate(
+                      offset: Offset(dragOffset, 0),
+                      child: Transform.rotate(
+                        angle: rotationAngle,
+                        child: _buildFullTaskCard(
+                          task: currentTask,
+                          isFront: true,
+                          taskIndex: _currentIndex % widget.tasks.length,
+                        ),
                       ),
                     ),
                   ),
@@ -236,6 +242,25 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
     final dueTimeString = task.dueDate != null
         ? '${task.dueDate!.hour.toString().padLeft(2, '0')}:${task.dueDate!.minute.toString().padLeft(2, '0')}'
         : '17:00';
+
+    String deadlineLabel;
+    if (task.dueDate != null) {
+      final now = DateTime.now();
+      final isToday = task.dueDate!.year == now.year &&
+          task.dueDate!.month == now.month &&
+          task.dueDate!.day == now.day;
+      const monthNames = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+        'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'
+      ];
+      if (isToday) {
+        deadlineLabel = 'Tenggat $dueTimeString WIB';
+      } else {
+        deadlineLabel = 'Tenggat ${task.dueDate!.day} ${monthNames[task.dueDate!.month - 1]}, $dueTimeString WIB';
+      }
+    } else {
+      deadlineLabel = 'Tenggat $dueTimeString WIB';
+    }
 
     final categoryLabel = task.matkul ?? task.workspace;
 
@@ -315,21 +340,20 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                 ),
               ),
 
-              if (isFront)
-                GestureDetector(
-                  onTap: () => widget.onEditTask(task),
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFF1F5F9),
-                    ),
-                    child: const Icon(Icons.more_horiz_rounded, size: 17, color: Color(0xFF64748B)),
+              GestureDetector(
+                onTap: isFront ? () => widget.onEditTask(task) : null,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFFF1F5F9),
                   ),
+                  child: const Icon(Icons.more_horiz_rounded, size: 17, color: Color(0xFF64748B)),
                 ),
+              ),
 
               GestureDetector(
                 onTap: isFront ? () => widget.onToggleTaskComplete(task) : null,
@@ -376,118 +400,171 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
           ),
 
           if (task.description != null && task.description!.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               task.description!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF64748B),
-                height: 1.35,
+                height: 1.4,
               ),
             ),
           ],
 
           const SizedBox(height: 10),
 
-          // ─── Subtasks Area (Expanded/Flexible agar mengisi ruang seragam) ─
+          // ─── Subtasks Area: Minimalist Floating Tiles (Gaya Linear / Amie) ─
           Expanded(
             child: task.subtasks.isNotEmpty
-                ? Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'SUBTASKS',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF64748B),
-                                letterSpacing: 0.5,
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Subtask Header & Subtle Segmented/Counter Pill
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFF6366F1), // Indigo accent dot
+                                ),
                               ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'CHECKLIST',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: task.doneSubtasksCount == task.totalSubtasksCount && task.totalSubtasksCount > 0
+                                  ? const Color(0xFFECFDF5)
+                                  : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            Text(
+                            child: Text(
                               '${task.doneSubtasksCount}/${task.totalSubtasksCount} selesai',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF334155),
+                                color: task.doneSubtasksCount == task.totalSubtasksCount && task.totalSubtasksCount > 0
+                                    ? const Color(0xFF059669)
+                                    : const Color(0xFF475569),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: task.totalSubtasksCount > 0
-                                ? task.doneSubtasksCount / task.totalSubtasksCount
-                                : 0.0,
-                            minHeight: 3.5,
-                            backgroundColor: const Color(0xFFE2E8F0),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF50689C)),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Expanded(
-                          child: ListView(
-                            physics: const BouncingScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            children: task.subtasks.take(2).map((subtask) {
-                              return GestureDetector(
-                                onTap: isFront ? () => widget.onToggleSubtask(task, subtask) : null,
-                                behavior: HitTestBehavior.opaque,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 2.5),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        subtask.isCompleted
-                                            ? Icons.check_circle_rounded
-                                            : Icons.radio_button_unchecked_rounded,
-                                        size: 15,
-                                        color: subtask.isCompleted
-                                            ? const Color(0xFF10B981)
-                                            : const Color(0xFF94A3B8),
-                                      ),
-                                      const SizedBox(width: 7),
-                                      Expanded(
-                                        child: Text(
-                                          subtask.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: subtask.isCompleted
-                                                ? const Color(0xFF94A3B8)
-                                                : const Color(0xFF1E293B),
-                                            decoration: subtask.isCompleted
-                                                ? TextDecoration.lineThrough
-                                                : null,
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Floating Tiles List
+                      Expanded(
+                        child: ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: task.subtasks.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 7),
+                          itemBuilder: (context, idx) {
+                            final subtask = task.subtasks[idx];
+                            final isDone = subtask.isCompleted;
+
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: isDone
+                                    ? const Color(0xFFF8FAFC).withOpacity(0.8)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(13),
+                                border: Border.all(
+                                  color: isDone
+                                      ? const Color(0xFFE2E8F0).withOpacity(0.6)
+                                      : const Color(0xFFE2E8F0),
+                                  width: 1,
+                                ),
+                                boxShadow: isDone
+                                    ? null
+                                    : const [
+                                        BoxShadow(
+                                          color: Color(0x060F172A),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: isFront ? () => widget.onToggleSubtask(task, subtask) : null,
+                                  borderRadius: BorderRadius.circular(13),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9.5),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Modern Rounded Check Pill
+                                        Container(
+                                          width: 19,
+                                          height: 19,
+                                          margin: const EdgeInsets.only(top: 1),
+                                          decoration: BoxDecoration(
+                                            color: isDone
+                                                ? const Color(0xFF10B981)
+                                                : const Color(0xFFF8FAFC),
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(
+                                              color: isDone
+                                                  ? const Color(0xFF10B981)
+                                                  : const Color(0xFFCBD5E1),
+                                              width: 1.4,
+                                            ),
+                                          ),
+                                          child: isDone
+                                              ? const Icon(
+                                                  Icons.check_rounded,
+                                                  size: 13,
+                                                  color: Colors.white,
+                                                )
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 10),
+
+                                        // Subtask Title Text
+                                        Expanded(
+                                          child: Text(
+                                            subtask.title,
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: isDone ? FontWeight.w400 : FontWeight.w500,
+                                              height: 1.35,
+                                              color: isDone
+                                                  ? const Color(0xFF94A3B8)
+                                                  : const Color(0xFF1E293B),
+                                              decoration: isDone ? TextDecoration.lineThrough : null,
+                                              decorationColor: const Color(0xFF94A3B8),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
+                              ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 : const SizedBox.shrink(),
           ),
@@ -513,7 +590,7 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          'Tenggat $dueTimeString WIB',
+                          deadlineLabel,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(

@@ -46,7 +46,6 @@ class UnifiedTaskGlassShell extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.white.withOpacity(0.06)
@@ -73,7 +72,7 @@ class UnifiedTaskGlassShell extends StatelessWidget {
         children: [
           // ─── 1. Overall Progress Header Row ──────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: Row(
               children: [
                 SizedBox(
@@ -90,7 +89,7 @@ class UnifiedTaskGlassShell extends StatelessWidget {
                 Text(
                   'Overall progress',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: overallProgressSubTextColor,
                     letterSpacing: -0.1,
@@ -100,7 +99,7 @@ class UnifiedTaskGlassShell extends StatelessWidget {
                 Text(
                   '$progressPercent%',
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: overallProgressTextColor,
                     letterSpacing: -0.1,
@@ -110,10 +109,8 @@ class UnifiedTaskGlassShell extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 18),
-
           // ─── 2. Stacked Task Cards Slider ─────────────────────────────────
-          // Front card with Subtasks & Deadline, back card peeking out with swipe gesture!
+          // Lebar kartu task sekarang sama persis dengan kartu glass pembungkusnya
           StackedTaskCardsSlider(
             isDark: isDark,
             tasks: tasks,
@@ -122,27 +119,32 @@ class UnifiedTaskGlassShell extends StatelessWidget {
             onEditTask: onEditTask,
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           // Divider subtle line
-          Container(
-            height: 1,
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            color: isDark
-                ? Colors.white.withOpacity(0.10)
-                : const Color(0xFFCBD5E1).withOpacity(0.6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              height: 1,
+              color: isDark
+                  ? Colors.white.withOpacity(0.10)
+                  : const Color(0xFFCBD5E1).withOpacity(0.6),
+            ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // ─── 3. Weekly Strip (Inside the Glass Shell) ─────────────────────
-          MinimalWeekStrip(
-            isDark: isDark,
-            days: weekDays,
-            selectedIndex: selectedDayIndex,
-            weekRangeText: weekRangeText,
-            onMonthCalendarTap: onMonthCalendarTap,
-            onDaySelected: onDaySelected,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+            child: MinimalWeekStrip(
+              isDark: isDark,
+              days: weekDays,
+              selectedIndex: selectedDayIndex,
+              weekRangeText: weekRangeText,
+              onMonthCalendarTap: onMonthCalendarTap,
+              onDaySelected: onDaySelected,
+            ),
           ),
         ],
       ),

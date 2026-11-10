@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../core/theme/theme_controller.dart';
-import '../features/home/presentation/screens/home_dashboard_screen.dart';
+import '../features/home/presentation/screens/minimal_editorial_home_screen.dart';
 import '../features/tasks/presentation/screens/tasks_screen.dart';
 import '../features/calendar/presentation/screens/calendar_screen.dart';
 import '../features/notes/presentation/screens/notes_screen.dart';
@@ -78,7 +78,7 @@ class _MainNavScreenState extends State<MainNavScreen>
 
   // 0: Home, 1: Tasks, 2: Calendar, 3: Notes, 4: Voice AI
   final List<Widget> _screens = const [
-    HomeDashboardScreen(),
+    MinimalEditorialHomeScreen(),
     TasksScreen(),
     CalendarScreen(),
     NotesScreen(),

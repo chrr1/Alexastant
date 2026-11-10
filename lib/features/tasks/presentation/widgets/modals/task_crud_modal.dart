@@ -50,6 +50,7 @@ class _TaskCrudModalState extends State<TaskCrudModal> {
   late final TextEditingController _newSubtaskCtrl;
 
   late TaskPriority _selectedPriority;
+  late DateTime _selectedDate;
   late TimeOfDay _selectedTime;
   late List<SubtaskItem> _subtasks;
 
@@ -67,8 +68,10 @@ class _TaskCrudModalState extends State<TaskCrudModal> {
     _selectedPriority = task?.priority ?? TaskPriority.medium;
 
     if (task?.dueDate != null) {
-      _selectedTime = TimeOfDay(hour: task!.dueDate!.hour, minute: task.dueDate!.minute);
+      _selectedDate = DateTime(task!.dueDate!.year, task.dueDate!.month, task.dueDate!.day);
+      _selectedTime = TimeOfDay(hour: task.dueDate!.hour, minute: task.dueDate!.minute);
     } else {
+      _selectedDate = DateTime.now();
       _selectedTime = const TimeOfDay(hour: 17, minute: 0);
     }
 
@@ -111,6 +114,57 @@ class _TaskCrudModalState extends State<TaskCrudModal> {
     });
   }
 
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 3)),
+      builder: (context, child) {
+        return Theme(
+          data: widget.isDark
+              ? ThemeData.dark().copyWith(
+                  colorScheme: const ColorScheme.dark(
+                    primary: Color(0xFF6366F1),
+                    onPrimary: Colors.white,
+                    surface: Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  ),
+                )
+              : ThemeData.light().copyWith(
+                  colorScheme: const ColorScheme.light(
+                    primary: Color(0xFF50689C),
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: Color(0xFF0F172A),
+                  ),
+                ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  String _formatDateString(DateTime date) {
+    const monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+      'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    final now = DateTime.now();
+    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    final tomorrow = now.add(const Duration(days: 1));
+    final isTomorrow = date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day;
+
+    if (isToday) return 'Hari ini, ${date.day} ${monthNames[date.month - 1]}';
+    if (isTomorrow) return 'Besok, ${date.day} ${monthNames[date.month - 1]}';
+    return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
+  }
+
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -136,11 +190,10 @@ class _TaskCrudModalState extends State<TaskCrudModal> {
       return;
     }
 
-    final now = DateTime.now();
     final dueDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
       _selectedTime.hour,
       _selectedTime.minute,
     );
@@ -391,33 +444,79 @@ class _TaskCrudModalState extends State<TaskCrudModal> {
 
             const SizedBox(height: 18),
 
-            // ─── 5. Jam Tenggat ────────────────────────────────────────────
-            _buildLabel('JAM TENGGAT', textMuted),
+            // ─── 5. Tenggat Waktu (Tanggal & Jam) ───────────────────────────
+            _buildLabel('TENGGAT WAKTU (DEADLINE)', textMuted),
             const SizedBox(height: 6),
-            GestureDetector(
-              onTap: _pickTime,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: fieldFillColor,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: borderColor),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')} WIB',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
+            Row(
+              children: [
+                // Tanggal Picker
+                Expanded(
+                  flex: 3,
+                  child: GestureDetector(
+                    onTap: _pickDate,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: fieldFillColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, size: 15, color: textMuted),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _formatDateString(_selectedDate),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Icon(Icons.access_time_rounded, size: 17, color: textMuted),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                // Jam Picker
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: _pickTime,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: fieldFillColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.access_time_rounded, size: 15, color: textMuted),
+                          const SizedBox(width: 7),
+                          Expanded(
+                            child: Text(
+                              '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')} WIB',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 20),
