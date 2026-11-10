@@ -29,12 +29,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen>
     if (_themeController == null) {
       _themeController = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 380),
+        duration: const Duration(milliseconds: 500),
         value: ThemeController.instance.isDarkMode ? 0.0 : 1.0,
       );
       _themeAnim = CurvedAnimation(
         parent: _themeController!,
-        curve: Curves.easeInOutCubic,
+        curve: Curves.easeInOutQuart,
       );
     }
   }
@@ -78,7 +78,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen>
     } else {
       _themeController?.forward();
     }
-    setState(() {});
+    // No setState() — AnimatedBuilder handles all frame rebuilds
   }
 
   void _toggleTheme() {
@@ -99,58 +99,92 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen>
         // ─── Continuous Interpolated Palette Tokens ─────────────────────────
         final accentColor = Color.lerp(
           const Color(0xFFFF5714),
-          const Color(0xFF0A84FF),
+          const Color(0xFFF26875), // Radiant Coral Orchid
           t,
         )!;
         final bg = Color.lerp(
           const Color(0xFF0B0B0E),
-          const Color(0xFFF0F4F8),
+          const Color(0xFFFDE9DF),
           t,
         )!;
+        // Milky Frosted Glass card surface in light mode (Skincare App Style)
         final cardBg = Color.lerp(
           const Color(0xFF14141A),
-          Colors.white,
+          Colors.white.withOpacity(0.85),
           t,
         )!;
         final cardInnerBg = Color.lerp(
           const Color(0xFF1A1A22),
-          const Color(0xFFF1F5F9),
+          const Color(0xFFFAF3F7), // Soft pearlescent inner tint
           t,
         )!;
         final cardBorder = Color.lerp(
           Colors.white.withOpacity(0.06),
-          const Color(0xFFDCE4EE),
+          Colors.white.withOpacity(0.85), // Crisply defined milky glass border
           t,
         )!;
         final textPrimary = Color.lerp(
           AppColors.textPrimary,
-          const Color(0xFF0F172A),
+          const Color(0xFF221B2C), // Deep Plum Slate (Rich Contrast)
           t,
         )!;
         final textMuted = Color.lerp(
           const Color(0xFF71717A),
-          const Color(0xFF64748B),
+          const Color(0xFF6E6479), // Atmospheric Lavender Slate
           t,
         )!;
         final topBtnBg = Color.lerp(
           const Color(0xFF18181E),
-          const Color(0xFFE2EBF5),
+          Colors.white.withOpacity(0.85),
           t,
         )!;
         final topBtnBorder = Color.lerp(
           Colors.white.withOpacity(0.08),
-          const Color(0xFFCBD8E6),
+          Colors.white.withOpacity(0.90),
           t,
         )!;
         final topIconColor = Color.lerp(
           const Color(0xFFD4D4D8),
-          const Color(0xFF1E293B),
+          const Color(0xFF221B2C),
           t,
         )!;
 
+        // Ethereal Aura / Iridescent Mesh Gradient (Peach Glow -> Lavender Orchid -> Rose Blush)
+        final backgroundDecoration = BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color.lerp(
+                const Color(0xFF0B0B0E),
+                const Color(0xFFFDE9DF), // Soft Apricot Peach Glow (Top-Left)
+                t,
+              )!,
+              Color.lerp(
+                const Color(0xFF0B0B0E),
+                const Color(0xFFE4D5F8), // Ethereal Lilac / Lavender (Center)
+                t,
+              )!,
+              Color.lerp(
+                const Color(0xFF0B0B0E),
+                const Color(0xFFF9A894), // Warm Coral Orchid (Accent Edge)
+                t,
+              )!,
+              Color.lerp(
+                const Color(0xFF0B0B0E),
+                const Color(0xFFF8E7F0), // Soft Blush Mist (Bottom)
+                t,
+              )!,
+            ],
+            stops: const [0.0, 0.40, 0.78, 1.0],
+          ),
+        );
+
         return Scaffold(
-          backgroundColor: bg,
-          body: SafeArea(
+          backgroundColor: Colors.transparent,
+          body: Container(
+            decoration: backgroundDecoration,
+            child: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -253,6 +287,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen>
               ),
             ),
           ),
+        ),
         );
       },
     );

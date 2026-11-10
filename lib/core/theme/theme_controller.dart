@@ -5,7 +5,7 @@ class ThemeController extends ChangeNotifier {
   static final ThemeController instance = ThemeController._();
   ThemeController._();
 
-  bool _isDarkMode = true;
+  bool _isDarkMode = false; // Default to Light Mode
   bool get isDarkMode => _isDarkMode;
 
   void toggleTheme() {
