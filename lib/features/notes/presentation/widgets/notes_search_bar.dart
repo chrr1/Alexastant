@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotesSearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -15,20 +15,36 @@ class NotesSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.cardBorder),
+          color: isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.white.withOpacity(0.72),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.12)
+                : Colors.white.withOpacity(0.92),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1E293B).withOpacity(isDark ? 0.20 : 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.search_rounded,
-              color: AppColors.textSecondary,
+              color: isDark ? const Color(0xFF818CF8) : const Color(0xFF6366F1),
               size: 20,
             ),
             const SizedBox(width: 10),
@@ -36,28 +52,37 @@ class NotesSearchBar extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 onChanged: onChanged,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: GoogleFonts.plusJakartaSans(
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                   fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Cari catatan, matkul, atau kata kunci...',
-                  hintStyle: TextStyle(
-                    color: AppColors.textMuted,
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                     fontSize: 13,
+                    fontWeight: FontWeight.w400,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 13),
                 ),
               ),
             ),
             if (controller.text.isNotEmpty)
               GestureDetector(
                 onTap: onClear,
-                child: const Icon(
-                  Icons.close_rounded,
-                  color: AppColors.textSecondary,
-                  size: 18,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.1) : const Color(0xFFE2E8F0),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: isDark ? Colors.white : const Color(0xFF475569),
+                    size: 14,
+                  ),
                 ),
               ),
           ],

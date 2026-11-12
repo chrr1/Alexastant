@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MatkulPickerSheet extends StatefulWidget {
   final List<String> matkulList;
@@ -29,62 +29,83 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 32 + bottomInset),
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 36 + bottomInset),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // handle
+          // ─── Handle ────────────────────────────────────────────────────────
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: 44,
+              height: 4.5,
               decoration: BoxDecoration(
-                color: AppColors.cardBorder,
-                borderRadius: BorderRadius.circular(2),
+                color: isDark ? Colors.white.withOpacity(0.2) : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          // back + title
+          const SizedBox(height: 18),
+
+          // ─── Back + Title ──────────────────────────────────────────────────
           Row(
             children: [
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: isDark
+                        ? const Color(0xFF0F172A)
+                        : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorder),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE2E8F0),
+                    ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.textPrimary,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     size: 15,
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Pilih Mata Kuliah',
-                    style: TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      letterSpacing: -0.3,
                     ),
                   ),
                   Text(
-                    'Catatan akan ditagging sesuai matkul',
-                    style: TextStyle(
+                    'Catatan akan ditagging sesuai mata kuliah',
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
                 ],
@@ -92,7 +113,8 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
             ],
           ),
           const SizedBox(height: 16),
-          // matkul list
+
+          // ─── Matkul List ───────────────────────────────────────────────────
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.35,
@@ -109,25 +131,31 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 13,
+                      vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: isDark
+                          ? const Color(0xFF0F172A)
+                          : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.06)
+                            : const Color(0xFFE2E8F0),
+                      ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 32,
-                          height: 32,
+                          width: 34,
+                          height: 34,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryOrange.withOpacity(0.12),
+                            color: const Color(0xFF2563EB).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             Icons.menu_book_rounded,
-                            color: AppColors.primaryOrange,
+                            color: Color(0xFF2563EB),
                             size: 16,
                           ),
                         ),
@@ -135,16 +163,16 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
                         Expanded(
                           child: Text(
                             mk,
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.chevron_right_rounded,
-                          color: AppColors.textMuted,
+                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                           size: 18,
                         ),
                       ],
@@ -155,7 +183,8 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          // add matkul baru
+
+          // ─── Add Matkul Baru ───────────────────────────────────────────────
           if (!_showAddField)
             GestureDetector(
               onTap: () => setState(() => _showAddField = true),
@@ -165,27 +194,27 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
                   vertical: 13,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOrange.withOpacity(0.08),
+                  color: const Color(0xFF2563EB).withOpacity(0.08),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primaryOrange.withOpacity(0.3),
+                    color: const Color(0xFF2563EB).withOpacity(0.25),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.add_rounded,
-                      color: AppColors.primaryOrange,
+                      color: Color(0xFF2563EB),
                       size: 18,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Tambah Mata Kuliah Baru',
-                      style: TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryOrange,
+                        color: const Color(0xFF2563EB),
                       ),
                     ),
                   ],
@@ -199,25 +228,27 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: isDark
+                          ? const Color(0xFF0F172A)
+                          : const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.primaryOrange),
+                      border: Border.all(color: const Color(0xFF2563EB)),
                     ),
                     child: TextField(
                       controller: _addCtrl,
                       autofocus: true,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                         fontSize: 13,
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Nama mata kuliah...',
-                        hintStyle: TextStyle(
-                          color: AppColors.textMuted,
+                        hintStyle: GoogleFonts.plusJakartaSans(
+                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                           fontSize: 13,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -232,8 +263,20 @@ class _MatkulPickerSheetState extends State<MatkulPickerSheet> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      gradient: AppColors.orangeGradient,
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF2563EB),
+                          Color(0xFF4F46E5),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF4F46E5).withOpacity(0.35),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: const Icon(
                       Icons.check_rounded,

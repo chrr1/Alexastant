@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
 
 class NotesAddFab extends StatelessWidget {
   final VoidCallback onTap;
@@ -13,20 +12,31 @@ class NotesAddFab extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 52,
-          height: 52,
-          decoration: const BoxDecoration(
+          width: 54,
+          height: 54,
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: AppColors.orangeGradient,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF2563EB), // Sapphire
+                Color(0xFF4F46E5), // Indigo
+              ],
+            ),
+            border: Border.all(
+              color: Colors.white,
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryOrangeGlow,
-                blurRadius: 16,
-                offset: Offset(0, 5),
+                color: const Color(0xFF4F46E5).withOpacity(0.45),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 26),
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
         ),
       ),
     );

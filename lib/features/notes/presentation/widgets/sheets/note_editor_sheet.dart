@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:alexa/features/notes/domain/models/note_model.dart';
 
 class NoteEditorSheet extends StatefulWidget {
@@ -25,17 +25,17 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
   Color get _accentColor {
     switch (widget.category) {
       case NoteCategory.kuliah:
-        return AppColors.primaryOrange;
+        return const Color(0xFF2563EB); // Sapphire
       case NoteCategory.ide:
-        return AppColors.warning;
+        return const Color(0xFFF59E0B); // Amber
       case NoteCategory.tech:
-        return AppColors.info;
+        return const Color(0xFF6366F1); // Indigo
       case NoteCategory.rapat:
-        return AppColors.purple;
+        return const Color(0xFF8B5CF6); // Purple
       case NoteCategory.pribadi:
-        return AppColors.success;
+        return const Color(0xFF10B981); // Emerald
       case NoteCategory.lainnya:
-        return AppColors.textSecondary;
+        return const Color(0xFF64748B); // Slate
     }
   }
 
@@ -70,7 +70,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Judul dan isi catatan tidak boleh kosong'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: Color(0xFFEF4444),
         ),
       );
       return;
@@ -92,41 +92,61 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 32 + bottomInset),
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 36 + bottomInset),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // handle
+          // ─── Handle ────────────────────────────────────────────────────────
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: 44,
+              height: 4.5,
               decoration: BoxDecoration(
-                color: AppColors.cardBorder,
-                borderRadius: BorderRadius.circular(2),
+                color: isDark ? Colors.white.withOpacity(0.2) : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          // top row: back + context badge
+          const SizedBox(height: 18),
+
+          // ─── Top Row: Back + Context Badge + Save Button ───────────────────
           Row(
             children: [
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: isDark
+                        ? const Color(0xFF0F172A)
+                        : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorder),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE2E8F0),
+                    ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.textPrimary,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     size: 15,
                   ),
                 ),
@@ -136,48 +156,62 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Tulis Catatan',
-                      style: TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        letterSpacing: -0.3,
                       ),
                     ),
                     if (widget.matkul != null)
                       Text(
                         '📚 ${widget.matkul}',
-                        style: const TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF2563EB),
                         ),
                       )
                     else
                       Text(
                         _categoryLabel,
-                        style: const TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         ),
                       ),
                   ],
                 ),
               ),
-              // save button
+              // Save button
               GestureDetector(
                 onTap: _save,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
+                    horizontal: 20,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    gradient: AppColors.orangeGradient,
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFF2563EB),
+                        Color(0xFF4F46E5),
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withOpacity(0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: const Text(
+                  child: Text(
                     'Simpan',
-                    style: TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -187,10 +221,11 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // category badge
+          const SizedBox(height: 18),
+
+          // ─── Category Badge ────────────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
             decoration: BoxDecoration(
               color: _accentColor.withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
@@ -209,9 +244,9 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
                 const SizedBox(width: 6),
                 Text(
                   widget.matkul ?? _categoryLabel,
-                  style: TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: _accentColor,
                   ),
                 ),
@@ -219,25 +254,34 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
             ),
           ),
           const SizedBox(height: 14),
-          // title field
+
+          // ─── Title Field ───────────────────────────────────────────────────
           TextField(
             controller: _titleCtrl,
-            style: const TextStyle(
-              fontSize: 16,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 16.5,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
             decoration: InputDecoration(
               hintText: widget.matkul != null
                   ? 'Judul catatan / pertemuan ke-...'
                   : 'Judul catatan...',
-              hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 16),
+              hintStyle: GoogleFonts.plusJakartaSans(
+                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                fontSize: 16.5,
+                fontWeight: FontWeight.w500,
+              ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
             ),
           ),
-          const Divider(color: AppColors.cardBorder, height: 20),
-          // content field
+          Divider(
+            color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFE2E8F0),
+            height: 22,
+          ),
+
+          // ─── Content Field ─────────────────────────────────────────────────
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.28,
@@ -245,16 +289,19 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
             child: TextField(
               controller: _contentCtrl,
               maxLines: null,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textPrimary,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13.5,
+                color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                 height: 1.6,
               ),
               decoration: InputDecoration(
                 hintText: widget.matkul != null
                     ? 'Tulis ringkasan materi, definisi, atau catatan penting...'
                     : 'Tulis catatan kamu di sini...',
-                hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  fontSize: 13.5,
+                ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
