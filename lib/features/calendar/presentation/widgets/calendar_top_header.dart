@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
 
 class CalendarTopHeader extends StatelessWidget {
   const CalendarTopHeader({super.key});
@@ -16,20 +15,31 @@ class CalendarTopHeader extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: AppColors.orangeGradient,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFE11D48),
+                    Color(0xFFBE123C),
+                  ],
+                ),
                 border: Border.all(
-                  color: AppColors.primaryOrange.withOpacity(0.4),
+                  color: Colors.white,
                   width: 2,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE11D48).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: const Center(
-                child: Text(
-                  'P',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                  ),
+                child: Icon(
+                  Icons.person_rounded,
+                  color: Colors.white,
+                  size: 22,
                 ),
               ),
             ),
@@ -40,18 +50,19 @@ class CalendarTopHeader extends StatelessWidget {
                 Text(
                   'Good Morning ☁️',
                   style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
+                    fontSize: 11.5,
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Peter Drogba',
+                  'Amelia',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],
@@ -61,27 +72,34 @@ class CalendarTopHeader extends StatelessWidget {
         Stack(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.cardBorder),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.notifications_none_rounded,
-                color: AppColors.textPrimary,
+                color: Color(0xFF334155),
                 size: 20,
               ),
             ),
             Positioned(
-              top: 10,
-              right: 10,
+              top: 9,
+              right: 9,
               child: Container(
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: AppColors.primaryOrange,
+                  color: Color(0xFF2563EB),
                   shape: BoxShape.circle,
                 ),
               ),

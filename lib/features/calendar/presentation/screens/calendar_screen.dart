@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:alexa/core/constants/app_colors.dart';
+import 'package:alexa/core/theme/theme_controller.dart';
 import 'package:alexa/features/calendar/domain/models/calendar_event_model.dart';
 import 'package:alexa/features/calendar/presentation/widgets/calendar_top_header.dart';
 import 'package:alexa/features/calendar/presentation/widgets/calendar_view_mode_toggle.dart';
 import 'package:alexa/features/calendar/presentation/widgets/month_calendar_grid.dart';
-import 'package:alexa/features/calendar/presentation/widgets/selected_day_detail_section.dart';
 import 'package:alexa/features/calendar/presentation/widgets/week_timeline_date_section.dart';
-import 'package:alexa/features/calendar/presentation/widgets/timeline_banner_shortcut.dart';
-import 'package:alexa/features/calendar/presentation/widgets/week_workspace_cards.dart';
-import 'package:alexa/features/calendar/presentation/widgets/calendar_today_task_card.dart';
+import 'package:alexa/features/calendar/presentation/widgets/vertical_timeline_schedule_section.dart';
 import 'package:alexa/features/calendar/presentation/widgets/calendar_add_fab.dart';
 
 // Re-export model & enum agar kompatibel jika ada import dari luar
@@ -21,10 +19,44 @@ class CalendarScreen extends StatefulWidget {
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  CalendarViewMode _viewMode = CalendarViewMode.month;
+class _CalendarScreenState extends State<CalendarScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _themeController;
+  late final Animation<double> _themeAnim;
+
+  CalendarViewMode _viewMode = CalendarViewMode.week; // Default ke Mingguan sesuai referensi
   final DateTime _currentMonth = DateTime(2026, 6, 1);
   int _selectedDay = 4; // 4 June 2026 default
+
+  @override
+  void initState() {
+    super.initState();
+    _themeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+      value: ThemeController.instance.isDarkMode ? 0.0 : 1.0,
+    );
+    _themeAnim = CurvedAnimation(
+      parent: _themeController,
+      curve: Curves.easeInOutCubic,
+    );
+    ThemeController.instance.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    ThemeController.instance.removeListener(_onThemeChanged);
+    _themeController.dispose();
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (ThemeController.instance.isDarkMode) {
+      _themeController.reverse();
+    } else {
+      _themeController.forward();
+    }
+  }
 
   // Data kegiatan per tanggal untuk penanda titik (dots) dan agenda detail
   final Map<int, List<CalendarEventItem>> _monthEvents = {
@@ -192,6 +224,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   ];
 
   final List<Map<String, dynamic>> _weekDays = [
+    {'num': '2', 'day': 'Mon'},
     {'num': '3', 'day': 'Tue'},
     {'num': '4', 'day': 'Wed'},
     {'num': '5', 'day': 'Thu'},
@@ -202,60 +235,83 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              const CalendarTopHeader(),
-              const SizedBox(height: 16),
-              CalendarViewModeToggle(
-                viewMode: _viewMode,
-                onChanged: (mode) => setState(() => _viewMode = mode),
+    return AnimatedBuilder(
+      animation: _themeAnim,
+      builder: (context, _) {
+        final t = _themeAnim.value;
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(const Color(0xFF0C101C), const Color(0xFFF1F6FC), t)!,
+                  Color.lerp(const Color(0xFF111728), const Color(0xFFF8FAFC), t)!,
+                  Color.lerp(const Color(0xFF0C111E), Colors.white, t)!,
+                ],
+                stops: const [0.0, 0.45, 1.0],
               ),
-              const SizedBox(height: 18),
-              if (_viewMode == CalendarViewMode.month) ...[
-                MonthCalendarGrid(
-                  currentMonth: _currentMonth,
-                  selectedDay: _selectedDay,
-                  monthEvents: _monthEvents,
-                  onDaySelected: (day) => setState(() => _selectedDay = day),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    const CalendarTopHeader(),
+                    const SizedBox(height: 16),
+                    CalendarViewModeToggle(
+                      viewMode: _viewMode,
+                      onChanged: (mode) => setState(() => _viewMode = mode),
+                    ),
+                    const SizedBox(height: 18),
+                    if (_viewMode == CalendarViewMode.month) ...[
+                      MonthCalendarGrid(
+                        currentMonth: _currentMonth,
+                        selectedDay: _selectedDay,
+                        monthEvents: _monthEvents,
+                        onDaySelected: (day) => setState(() => _selectedDay = day),
+                      ),
+                      const SizedBox(height: 22),
+                      VerticalTimelineScheduleSection(
+                        selectedDay: _selectedDay,
+                        headerTitle: 'Agenda $_selectedDay Juni 2026',
+                        events: _monthEvents[_selectedDay] ?? [],
+                        dueTasks: _dueTasks.where((t) => t['dueDay'] == _selectedDay).toList(),
+                        onToggleTaskDone: (task) {
+                          setState(() {
+                            task['isDone'] = !(task['isDone'] as bool);
+                          });
+                        },
+                      ),
+                    ] else ...[
+                      WeekTimelineDateSection(
+                        selectedDay: _selectedDay,
+                        weekDays: _weekDays,
+                        onDaySelected: (day) => setState(() => _selectedDay = day),
+                      ),
+                      const SizedBox(height: 22),
+                      VerticalTimelineScheduleSection(
+                        selectedDay: _selectedDay,
+                      ),
+                    ],
+                    const SizedBox(height: 110),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                SelectedDayDetailSection(
-                  selectedDay: _selectedDay,
-                  events: _monthEvents[_selectedDay] ?? [],
-                  dueTasks: _dueTasks,
-                  onToggleTaskDone: (task) {
-                    setState(() {
-                      task['isDone'] = !(task['isDone'] as bool);
-                    });
-                  },
-                ),
-              ] else ...[
-                WeekTimelineDateSection(
-                  selectedDay: _selectedDay,
-                  weekDays: _weekDays,
-                  onDaySelected: (day) => setState(() => _selectedDay = day),
-                ),
-                const SizedBox(height: 16),
-                const TimelineBannerShortcut(),
-                const SizedBox(height: 20),
-                const WeekWorkspaceCards(),
-                const SizedBox(height: 24),
-                const CalendarTodayTaskCard(),
-              ],
-              const SizedBox(height: 100),
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
-      floatingActionButton: const CalendarAddFab(),
+          floatingActionButton: const CalendarAddFab(),
+        );
+      },
     );
   }
 }

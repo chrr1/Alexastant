@@ -56,6 +56,25 @@ class _AlexaAppState extends State<AlexaApp> {
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: const Color(0xFFF0F4F8),
       ),
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final screenWidth = mediaQuery.size.width;
+
+        // Normal base standard smartphone width adalah ~392 dp.
+        // Jika user mengubah DPI di Developer Options (misal DPI 500 -> logical width ~480-520 dp),
+        // scaleFactor mengimbangi agar teks dan elemen UI tetap tampil nyaman dan terbaca seperti di 392 dp normal.
+        double scaleFactor = 1.0;
+        if (screenWidth > 392.0 && screenWidth < 600.0) {
+          scaleFactor = (screenWidth / 392.0).clamp(1.0, 1.30);
+        }
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: TextScaler.linear(scaleFactor),
+          ),
+          child: child!,
+        );
+      },
       home: const MainNavScreen(),
     );
   }

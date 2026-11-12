@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_controller.dart';
 
 /// Minimalist Editorial Home Screen:
@@ -133,42 +134,79 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                           SizedBox(height: topSpacing),
                           const SizedBox(height: 40),
 
-                          // ─── 2. Editorial Date & Greeting (Hampir di tengah) ────────────
-                          Text(
-                            _getFormattedDate(),
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w500,
-                              color: textPrimary,
-                              letterSpacing: -0.1,
+                          // ─── 2. Editorial Date & Greeting (Luxury Editorial Style) ──────
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.08)
+                                  : Colors.white.withOpacity(0.60),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.12)
+                                    : Colors.white.withOpacity(0.85),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF1E293B).withOpacity(0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 5,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFF6366F1), // Indigo jewel dot
+                                  ),
+                                ),
+                                const SizedBox(width: 7),
+                                Text(
+                                  _getFormattedDate(),
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                                    letterSpacing: 0.1,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 12),
                           Text(
                             _getGreeting(),
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                              letterSpacing: -0.7,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w400, // Clean, relaxed modern sans
+                              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                              letterSpacing: -0.6,
                               height: 1.15,
                             ),
                           ),
                           Text(
                             'Amelia',
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600,
+                            style: GoogleFonts.newsreader(
+                              fontSize: 38,
+                              fontWeight: FontWeight.w700, // Rich contemporary serif
+                              fontStyle: FontStyle.italic,
                               color: textPrimary,
-                              letterSpacing: -0.7,
+                              letterSpacing: -0.5,
                               height: 1.15,
                             ),
                           ),
 
-                          const SizedBox(height: 184),
+                          const SizedBox(height: 134),
 
-                          // ─── 3. Floating Frosted Glass Hero Card (Flight Itinerary) ─────
-                          _buildHeroFlightCard(
+                          // ─── 3. Floating Frosted Glass Hero Card (Jadwal Kuliah Terdekat) ─────
+                          _buildHeroScheduleCard(
                             isDark: isDark,
                             textPrimary: textPrimary,
                             textSecondary: textSecondary,
@@ -385,8 +423,8 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
     );
   }
 
-  // ─── HERO FLIGHT CARD ───────────────────────────────────────────────────────
-  Widget _buildHeroFlightCard({
+  // ─── HERO SCHEDULE CARD (OPTION 1: SESI KULIAH / AGENDA TERDEKAT) ──────────
+  Widget _buildHeroScheduleCard({
     required bool isDark,
     required Color textPrimary,
     required Color textSecondary,
@@ -424,7 +462,7 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ─── Top Section: Flight Info & Badges ─────────────────────────────
+          // ─── Top Section: Course / Agenda Info & Badges ───────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
             child: Row(
@@ -437,19 +475,19 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Flight from',
+                        'Jadwal Berikutnya',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.w600,
                           color: isDark
                               ? const Color(0xFFCBD5E1)
-                              : const Color(0xFF334155),
+                              : const Color(0xFF475569),
                           letterSpacing: -0.2,
                         ),
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'New York to Tokyo',
+                        'Rekayasa Perangkat Lunak',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -459,7 +497,7 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                       ),
                       const SizedBox(height: 12),
 
-                      // Code Tag Pill (e.g. FY8722)
+                      // Location & Room Tag Pill
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
@@ -479,22 +517,22 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.nights_stay_rounded,
+                              Icons.location_on_rounded,
                               size: 13,
                               color: isDark
                                   ? const Color(0xFF94A3B8)
                                   : const Color(0xFF64748B),
                             ),
-                            const SizedBox(width: 5),
+                            const SizedBox(width: 4),
                             Text(
-                              'FY8722',
+                              'Lab Komputer 3 • Gedung F',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: isDark
                                     ? const Color(0xFFCBD5E1)
                                     : const Color(0xFF475569),
-                                letterSpacing: 0.3,
+                                letterSpacing: 0.1,
                               ),
                             ),
                           ],
@@ -504,11 +542,11 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                   ),
                 ),
 
-                // Right Badges (Airline Logo + Overlapping Seat Badge Pill)
+                // Right Badges (Academic Category Icon + Overlapping SKS Badge Pill)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Airline Logo Circle
+                    // Academic / Category Circle Icon
                     Container(
                       width: 36,
                       height: 36,
@@ -523,20 +561,21 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: CustomPaint(
-                          size: const Size(20, 14),
-                          painter: _AirlineWingLogoPainter(),
+                      child: const Center(
+                        child: Icon(
+                          Icons.terminal_rounded,
+                          size: 18,
+                          color: Color(0xFF1E3A8A), // Tech/Software Navy Blue
                         ),
                       ),
                     ),
 
-                    // Blue Seat / Gate Badge overlapping with soft blue glow
+                    // Blue SKS Badge overlapping with soft blue glow
                     Transform.translate(
                       offset: const Offset(-6, 0),
                       child: Container(
                         height: 36,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 11),
                         decoration: BoxDecoration(
                           color: const Color(0xFF2563EB), // Vibrant royal blue
                           borderRadius: BorderRadius.circular(18),
@@ -550,9 +589,9 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                         ),
                         child: const Center(
                           child: Text(
-                            'A6',
+                            '3 SKS',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 12,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
                               letterSpacing: 0.2,
@@ -567,7 +606,7 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
             ),
           ),
 
-          // ─── Bottom Section: Departure/Arrival Trajectory Schedule ────────
+          // ─── Bottom Section: Session Time Trajectory Schedule ─────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
             child: Container(
@@ -579,12 +618,12 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
               ),
               child: Row(
                 children: [
-                  // Origin: JFK
+                  // Start Time: 09:30
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '22:30',
+                        '09:30',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -594,9 +633,9 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'JFK',
+                        'MULAI',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                           color: textSecondary,
                           letterSpacing: 0.5,
@@ -622,12 +661,12 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                     ),
                   ),
 
-                  // Destination: HND
+                  // End Time: 11:45
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '06:20',
+                        '11:45',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -637,9 +676,9 @@ class _MinimalEditorialHomeScreenState extends State<MinimalEditorialHomeScreen>
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'HND',
+                        'SELESAI',
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                           color: textSecondary,
                           letterSpacing: 0.5,
@@ -748,38 +787,5 @@ class _FlightTrajectoryPainter extends CustomPainter {
       oldDelegate.color != color;
 }
 
-// ─── AIRLINE WING LOGO PAINTER ───────────────────────────────────────────────
-class _AirlineWingLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintNavy = Paint()
-      ..color = const Color(0xFF1E3A8A)
-      ..style = PaintingStyle.fill;
-    final paintRed = Paint()
-      ..color = const Color(0xFFDC2626)
-      ..style = PaintingStyle.fill;
-
-    // Upper navy wing
-    final pathNavy = Path()
-      ..moveTo(0, size.height * 0.7)
-      ..lineTo(size.width * 0.7, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width * 0.3, size.height * 0.7)
-      ..close();
-    canvas.drawPath(pathNavy, paintNavy);
-
-    // Lower red wing
-    final pathRed = Path()
-      ..moveTo(size.width * 0.2, size.height)
-      ..lineTo(size.width * 0.85, size.height * 0.35)
-      ..lineTo(size.width, size.height * 0.35)
-      ..lineTo(size.width * 0.35, size.height)
-      ..close();
-    canvas.drawPath(pathRed, paintRed);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
 

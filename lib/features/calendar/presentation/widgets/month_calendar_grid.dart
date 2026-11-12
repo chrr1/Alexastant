@@ -32,9 +32,16 @@ class MonthCalendarGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -49,22 +56,22 @@ class MonthCalendarGrid extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryOrangeSoft,
+                      color: const Color(0xFF2563EB).withOpacity(0.10),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${monthEvents.values.fold(0, (sum, list) => sum + list.length)} Kegiatan',
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryOrangeLight,
+                        color: Color(0xFF2563EB),
                       ),
                     ),
                   ),
@@ -97,7 +104,7 @@ class MonthCalendarGrid extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
+                      color: Color(0xFF64748B),
                     ),
                   ),
                 ),
@@ -134,24 +141,24 @@ class MonthCalendarGrid extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primaryOrange
+                        ? const Color(0xFF2563EB)
                         : (hasEvents
-                            ? AppColors.surfaceSecondary
+                            ? const Color(0xFFF8FAFC)
                             : Colors.transparent),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isSelected
                           ? Colors.transparent
                           : (hasEvents
-                              ? AppColors.primaryOrange.withOpacity(0.25)
-                              : AppColors.cardBorder),
+                              ? const Color(0xFFCBD5E1)
+                              : Colors.transparent),
                     ),
                     boxShadow: isSelected
-                        ? const [
+                        ? [
                             BoxShadow(
-                              color: AppColors.primaryOrangeGlow,
+                              color: const Color(0xFF2563EB).withOpacity(0.35),
                               blurRadius: 12,
-                              offset: Offset(0, 4),
+                              offset: const Offset(0, 4),
                             )
                           ]
                         : null,
@@ -167,8 +174,8 @@ class MonthCalendarGrid extends StatelessWidget {
                           color: isSelected
                               ? Colors.white
                               : (hasEvents
-                                  ? AppColors.textPrimary
-                                  : AppColors.textSecondary),
+                                  ? const Color(0xFF0F172A)
+                                  : const Color(0xFF94A3B8)),
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -199,17 +206,17 @@ class MonthCalendarGrid extends StatelessWidget {
             },
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Legenda Warna Penanda Kegiatan
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegendItem(AppColors.primaryOrange, 'Rapat/Workspace'),
+              _buildLegendItem(const Color(0xFF2563EB), 'Rapat/Workspace'),
               const SizedBox(width: 14),
-              _buildLegendItem(AppColors.success, 'Tugas/Selesai'),
+              _buildLegendItem(const Color(0xFF10B981), 'Tugas/Selesai'),
               const SizedBox(width: 14),
-              _buildLegendItem(AppColors.purple, 'Project/Pribadi'),
+              _buildLegendItem(const Color(0xFF8B5CF6), 'Project/Pribadi'),
             ],
           ),
         ],
@@ -224,11 +231,11 @@ class MonthCalendarGrid extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondary,
+          color: const Color(0xFFF1F5F9),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
-        child: Icon(icon, size: 18, color: AppColors.textPrimary),
+        child: Icon(icon, size: 18, color: const Color(0xFF334155)),
       ),
     );
   }
@@ -245,8 +252,8 @@ class MonthCalendarGrid extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 9,
-            color: AppColors.textSecondary,
+            fontSize: 9.5,
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w500,
           ),
         ),

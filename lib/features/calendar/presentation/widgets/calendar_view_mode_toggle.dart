@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
 import 'package:alexa/features/calendar/domain/models/calendar_event_model.dart';
 
 class CalendarViewModeToggle extends StatelessWidget {
@@ -17,9 +16,9 @@ class CalendarViewModeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -29,7 +28,7 @@ class CalendarViewModeToggle extends StatelessWidget {
             icon: Icons.calendar_view_month_rounded,
           ),
           _buildToggleOption(
-            title: 'Mingguan (Workspaces)',
+            title: 'Mingguan (Timeline)',
             mode: CalendarViewMode.week,
             icon: Icons.calendar_view_week_rounded,
           ),
@@ -47,19 +46,20 @@ class CalendarViewModeToggle extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: () => onChanged(mode),
+        behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryOrange : Colors.transparent,
+            color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             boxShadow: isSelected
-                ? const [
+                ? [
                     BoxShadow(
-                      color: AppColors.primaryOrangeGlow,
+                      color: const Color(0xFF0F172A).withOpacity(0.08),
                       blurRadius: 10,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ]
                 : null,
@@ -69,16 +69,16 @@ class CalendarViewModeToggle extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 14,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
+                size: 15,
+                color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF64748B),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 5),
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
                 ),
               ),
             ],
