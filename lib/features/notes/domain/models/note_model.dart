@@ -11,6 +11,7 @@ class NoteModel {
   final Color accentColor;
   final NoteCategory category;
   final String? matkul; // only for kuliah category
+  final bool isPinned;
 
   NoteModel({
     required this.id,
@@ -18,9 +19,33 @@ class NoteModel {
     required this.content,
     required this.tags,
     required this.date,
-    required this.accentColor,
+    this.accentColor = const Color(0xFF6366F1),
     this.category = NoteCategory.lainnya,
     this.matkul,
+    this.isPinned = false,
   });
-}
 
+  NoteModel copyWith({
+    String? id,
+    String? title,
+    String? content,
+    List<String>? tags,
+    String? date,
+    Color? accentColor,
+    NoteCategory? category,
+    String? matkul,
+    bool? isPinned,
+  }) {
+    return NoteModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      tags: tags ?? this.tags,
+      date: date ?? this.date,
+      accentColor: accentColor ?? this.accentColor,
+      category: category ?? this.category,
+      matkul: matkul ?? this.matkul,
+      isPinned: isPinned ?? this.isPinned,
+    );
+  }
+}

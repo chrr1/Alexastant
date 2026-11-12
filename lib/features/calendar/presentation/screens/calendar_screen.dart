@@ -247,14 +247,15 @@ class _CalendarScreenState extends State<CalendarScreen>
             height: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: const Alignment(-0.8, -0.9),
+                end: const Alignment(0.9, 0.95),
                 colors: [
-                  Color.lerp(const Color(0xFF0C101C), const Color(0xFFF1F6FC), t)!,
-                  Color.lerp(const Color(0xFF111728), const Color(0xFFF8FAFC), t)!,
-                  Color.lerp(const Color(0xFF0C111E), Colors.white, t)!,
+                  Color.lerp(const Color(0xFF0C101C), const Color(0xFFD6E4F4), t)!,
+                  Color.lerp(const Color(0xFF111728), const Color(0xFFFDE8DC), t)!,
+                  Color.lerp(const Color(0xFF18152C), const Color(0xFFECE3F8), t)!,
+                  Color.lerp(const Color(0xFF0C111E), const Color(0xFFDCE7F7), t)!,
                 ],
-                stops: const [0.0, 0.45, 1.0],
+                stops: const [0.0, 0.38, 0.72, 1.0],
               ),
             ),
             child: SafeArea(
