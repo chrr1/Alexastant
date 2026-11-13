@@ -7,7 +7,7 @@ class MinimalTaskHeader extends StatelessWidget {
   final bool isDark;
   final String dateText;
   final int progressPercent;
-  final VoidCallback onActionTap;
+  final VoidCallback? onActionTap;
   final VoidCallback onAddTask;
 
   const MinimalTaskHeader({
@@ -15,7 +15,7 @@ class MinimalTaskHeader extends StatelessWidget {
     required this.isDark,
     this.dateText = 'Wed, Aug 4',
     this.progressPercent = 35,
-    required this.onActionTap,
+    this.onActionTap,
     required this.onAddTask,
   });
 

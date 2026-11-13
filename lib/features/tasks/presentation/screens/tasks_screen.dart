@@ -45,10 +45,6 @@ class _TasksScreenState extends State<TasksScreen>
     }
   }
 
-  void _toggleTheme() {
-    ThemeController.instance.toggleTheme();
-  }
-
   // ── Selected Date & Week Strip ─────────────────────────────────────────────
   DateTime _currentSelectedDate = DateTime.now();
   int _selectedDayIndex = 0;
@@ -386,12 +382,11 @@ class _TasksScreenState extends State<TasksScreen>
                         children: [
                           const SizedBox(height: 14),
 
-                          // ─── 1. Header Luar: Today & Date + Add Button + Theme Toggle
+                          // ─── 1. Header Luar: Today & Date + Add Button
                           MinimalTaskHeader(
                             isDark: isDark,
                             dateText: dateText,
                             progressPercent: displayProgress,
-                            onActionTap: _toggleTheme,
                             onAddTask: _openCreateTaskModal,
                           ),
 

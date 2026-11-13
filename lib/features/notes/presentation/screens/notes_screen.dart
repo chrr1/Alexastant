@@ -339,10 +339,6 @@ class _NotesScreenState extends State<NotesScreen>
                       totalNotes: _filteredNotes.length,
                       selectedCategory: _selectedCategory,
                       onCategoryChanged: (cat) => setState(() => _selectedCategory = cat),
-                      onMenuTap: () {
-                        // Quick switch theme or open settings
-                        ThemeController.instance.toggleTheme();
-                      },
                     ),
                   ),
 

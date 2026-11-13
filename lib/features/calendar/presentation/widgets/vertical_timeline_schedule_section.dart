@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:alexa/core/theme/theme_controller.dart';
 import 'package:alexa/features/calendar/domain/models/calendar_event_model.dart';
 
 class TimelineEventModel {
@@ -113,7 +114,7 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = ThemeController.instance.isDarkMode;
     final timelineEvents = _getEventsForDay(selectedDay);
 
     return Column(
@@ -152,17 +153,17 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2563EB).withOpacity(0.10),
+                  color: isDark ? Colors.white.withOpacity(0.10) : const Color(0xFF2563EB).withOpacity(0.10),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   events != null
                       ? (events!.isEmpty ? '0 Agenda' : '${events!.length} Agenda')
                       : 'Jadwal Hari Ini',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2563EB),
+                    color: isDark ? Colors.white : const Color(0xFF2563EB),
                   ),
                 ),
               ),
@@ -177,15 +178,15 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+              color: isDark ? const Color(0xFF161616) : const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFE2E8F0),
+                color: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
                 width: 1.2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(isDark ? 0.20 : 0.03),
+                  color: Colors.black.withOpacity(isDark ? 0.35 : 0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -197,12 +198,12 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB).withOpacity(0.10),
+                    color: isDark ? Colors.white.withOpacity(0.10) : const Color(0xFF2563EB).withOpacity(0.10),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.event_available_rounded,
-                    color: Color(0xFF2563EB),
+                    color: isDark ? Colors.white : const Color(0xFF2563EB),
                     size: 22,
                   ),
                 ),
@@ -257,7 +258,7 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                             left: 15,
                             child: Container(
                               width: 2,
-                              color: const Color(0xFF60A5FA).withOpacity(isDark ? 0.40 : 0.45),
+                              color: isDark ? Colors.white.withOpacity(0.35) : const Color(0xFF60A5FA).withOpacity(0.45),
                             ),
                           ),
 
@@ -272,12 +273,14 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                                       shape: BoxShape.circle,
                                       color: isDark ? const Color(0xFF0F172A) : Colors.white,
                                       border: Border.all(
-                                        color: const Color(0xFF2563EB),
+                                        color: isDark ? Colors.white : const Color(0xFF2563EB),
                                         width: 2.2,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF2563EB).withOpacity(0.35),
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.20)
+                                              : const Color(0xFF2563EB).withOpacity(0.35),
                                           blurRadius: 8,
                                           spreadRadius: 1,
                                         ),
@@ -287,9 +290,9 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                                       child: Container(
                                         width: 10,
                                         height: 10,
-                                        decoration: const BoxDecoration(
+                                        decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Color(0xFF2563EB),
+                                          color: isDark ? Colors.white : const Color(0xFF2563EB),
                                         ),
                                       ),
                                     ),
@@ -301,7 +304,7 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                                       shape: BoxShape.circle,
                                       color: isDark ? const Color(0xFF0F172A) : Colors.white,
                                       border: Border.all(
-                                        color: const Color(0xFF60A5FA),
+                                        color: isDark ? Colors.white38 : const Color(0xFF60A5FA),
                                         width: 2,
                                       ),
                                     ),
@@ -349,15 +352,15 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        color: isDark ? const Color(0xFF161616) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFE2E8F0),
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(isDark ? 0.20 : 0.03),
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -375,12 +378,12 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2563EB).withOpacity(0.12),
+                      color: isDark ? Colors.white.withOpacity(0.12) : const Color(0xFF2563EB).withOpacity(0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.assignment_turned_in_rounded,
-                      color: Color(0xFF2563EB),
+                      color: isDark ? Colors.white : const Color(0xFF2563EB),
                       size: 16,
                     ),
                   ),
@@ -410,15 +413,15 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2563EB).withOpacity(0.10),
+                  color: isDark ? Colors.white.withOpacity(0.10) : const Color(0xFF2563EB).withOpacity(0.10),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${tasks.where((t) => t['isDone'] == true).length}/${tasks.length} Selesai',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2563EB),
+                    color: isDark ? Colors.white : const Color(0xFF2563EB),
                   ),
                 ),
               ),
@@ -434,10 +437,10 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                  color: isDark ? const Color(0xFF000000) : Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? Colors.white.withOpacity(0.06) : const Color(0xFFE2E8F0),
+                    color: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Row(
@@ -467,16 +470,16 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2563EB).withOpacity(0.08),
+                        color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFF2563EB).withOpacity(0.08),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         task['matkul'] != null
                             ? '📚 ${task['matkul']}'
                             : task['workspace'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 9.5,
-                          color: Color(0xFF2563EB),
+                          color: isDark ? Colors.white70 : const Color(0xFF2563EB),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -496,11 +499,13 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF3B82F6), // Vibrant primary blue
+        color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFF3B82F6), // Dark=gelap, Light=biru
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3B82F6).withOpacity(0.38),
+            color: isDark
+                ? Colors.black.withOpacity(0.50)
+                : const Color(0xFF3B82F6).withOpacity(0.38),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -574,11 +579,11 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.bubble_chart_rounded,
                     size: 19,
-                    color: Color(0xFF2563EB),
+                    color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFF2563EB),
                   ),
                 ),
               ),
@@ -594,15 +599,15 @@ class VerticalTimelineScheduleSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        color: isDark ? const Color(0xFF161616) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFE2E8F0),
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(isDark ? 0.20 : 0.03),
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
