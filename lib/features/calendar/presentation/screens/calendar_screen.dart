@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:alexa/core/constants/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:alexa/core/theme/theme_controller.dart';
 import 'package:alexa/features/calendar/domain/models/calendar_event_model.dart';
-import 'package:alexa/features/calendar/presentation/widgets/calendar_top_header.dart';
-import 'package:alexa/features/calendar/presentation/widgets/calendar_view_mode_toggle.dart';
-import 'package:alexa/features/calendar/presentation/widgets/month_calendar_grid.dart';
-import 'package:alexa/features/calendar/presentation/widgets/week_timeline_date_section.dart';
-import 'package:alexa/features/calendar/presentation/widgets/vertical_timeline_schedule_section.dart';
-import 'package:alexa/features/calendar/presentation/widgets/calendar_add_fab.dart';
+import 'package:alexa/features/calendar/domain/calendar_samsung_data.dart';
+import 'package:alexa/features/calendar/presentation/widgets/samsung_month_grid.dart';
+import 'package:alexa/features/calendar/presentation/widgets/day_agenda_bottom_sheet.dart';
+import 'package:alexa/features/calendar/presentation/widgets/calendar_add_action_sheet.dart';
+import 'package:alexa/features/calendar/presentation/screens/samsung_reminder_form_screen.dart';
 
-// Re-export model & enum agar kompatibel jika ada import dari luar
+// Re-export model & data untuk kompatibilitas
 export 'package:alexa/features/calendar/domain/models/calendar_event_model.dart';
+export 'package:alexa/features/calendar/domain/calendar_samsung_data.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -24,13 +24,48 @@ class _CalendarScreenState extends State<CalendarScreen>
   late final AnimationController _themeController;
   late final Animation<double> _themeAnim;
 
-  CalendarViewMode _viewMode = CalendarViewMode.week; // Default ke Mingguan sesuai referensi
-  final DateTime _currentMonth = DateTime(2026, 6, 1);
-  int _selectedDay = 4; // 4 June 2026 default
+  // Bulan default Oktober 2026 (Sesuai Gambar 3)
+  final DateTime _currentMonth = DateTime(2026, 10, 1);
+  int _selectedDay = 1;
+
+  // Data event kalender
+  late Map<int, List<CalendarEventItem>> _events;
+
+  // Sinkronisasi tugas perkuliahan jatuh tempo
+  final List<Map<String, dynamic>> _dueTasks = [
+    {
+      'id': 't1',
+      'title': 'Kirim Laporan Progres Praktikum',
+      'workspace': 'Kuliah',
+      'matkul': 'Praktikum Audio',
+      'priority': 'Tinggi',
+      'isDone': false,
+      'dueDay': 5,
+    },
+    {
+      'id': 't2',
+      'title': 'Belajar Persiapan UTS Mekanik',
+      'workspace': 'Kuliah',
+      'matkul': 'Mekanika',
+      'priority': 'Sedang',
+      'isDone': false,
+      'dueDay': 8,
+    },
+    {
+      'id': 't3',
+      'title': 'Finalisasi Proposal HIMA',
+      'workspace': 'Organisasi',
+      'priority': 'Urgent',
+      'isDone': true,
+      'dueDay': 1,
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
+    _events = CalendarSamsungData.getOctoberEvents();
+
     _themeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -58,180 +93,92 @@ class _CalendarScreenState extends State<CalendarScreen>
     }
   }
 
-  // Data kegiatan per tanggal untuk penanda titik (dots) dan agenda detail
-  final Map<int, List<CalendarEventItem>> _monthEvents = {
-    2: [
-      CalendarEventItem(
-        id: 'e1',
-        title: 'Persiapan Proposal Klien',
-        time: '10:00 - 11:30',
-        duration: '1.5 jam',
-        location: 'Online Meeting',
-        color: AppColors.info,
-        category: 'Workspace',
-      ),
-    ],
-    4: [
-      CalendarEventItem(
-        id: 'e2',
-        title: 'Rapat Proyek Kampus',
-        time: '09:00 - 10:00',
-        duration: '1 jam',
-        location: 'Zoom Meeting',
-        color: AppColors.primaryOrange,
-        category: 'Rapat',
-        isCompleted: true,
-      ),
-      CalendarEventItem(
-        id: 'e3',
-        title: 'Landing page for TRIPPIES',
-        time: '11:00 - 13:00',
-        duration: '2 jam',
-        location: 'Design Studio',
-        color: AppColors.success,
-        category: 'Tugas',
-      ),
-      CalendarEventItem(
-        id: 'e4',
-        title: 'Review Tugas Harian',
-        time: '14:00 - 15:30',
-        duration: '1.5 jam',
-        location: 'Google Meet',
-        color: AppColors.purple,
-        category: 'Project',
-      ),
-      CalendarEventItem(
-        id: 'e5',
-        title: 'Evaluasi Rekrutmen Tim',
-        time: '16:00 - 17:00',
-        duration: '1 jam',
-        location: 'Ruang Meeting 2',
-        color: AppColors.warning,
-        category: 'Internal',
-      ),
-    ],
-    8: [
-      CalendarEventItem(
-        id: 'e6',
-        title: 'Sprint Planning Mingguan',
-        time: '09:30 - 11:00',
-        duration: '1.5 jam',
-        location: 'Zoom',
-        color: AppColors.primaryOrange,
-        category: 'Rapat',
-      ),
-    ],
-    12: [
-      CalendarEventItem(
-        id: 'e7',
-        title: 'Deadline UI Testing Prototype',
-        time: '17:00',
-        duration: 'Milestone',
-        location: 'GitHub / Jira',
-        color: AppColors.success,
-        category: 'Deadline',
-      ),
-      CalendarEventItem(
-        id: 'e8',
-        title: 'Sesi Deep Work & Coding API',
-        time: '19:00 - 21:00',
-        duration: '2 jam',
-        location: 'Home Workspace',
-        color: AppColors.info,
-        category: 'Fokus',
-      ),
-    ],
-    15: [
-      CalendarEventItem(
-        id: 'e9',
-        title: 'Presentasi Klien Tahap 2',
-        time: '13:30 - 15:00',
-        duration: '1.5 jam',
-        location: 'Ruang Rapat Utama',
-        color: AppColors.primaryOrange,
-        category: 'Rapat',
-      ),
-      CalendarEventItem(
-        id: 'e10',
-        title: 'Review Catatan REST API',
-        time: '16:00 - 17:00',
-        duration: '1 jam',
-        location: 'Notion / Supabase',
-        color: AppColors.purple,
-        category: 'Belajar',
-      ),
-    ],
-    22: [
-      CalendarEventItem(
-        id: 'e11',
-        title: 'Due Date: Task Planner Apps',
-        time: '23:59',
-        duration: 'Deadline',
-        location: 'App Store / Play Store',
-        color: AppColors.warning,
-        category: 'Deadline',
-      ),
-    ],
-    28: [
-      CalendarEventItem(
-        id: 'e12',
-        title: 'Monthly Team Retrospective',
-        time: '15:00 - 16:30',
-        duration: '1.5 jam',
-        location: 'Google Meet',
-        color: AppColors.primaryOrange,
-        category: 'Rapat',
-      ),
-    ],
-  };
+  // ─── Buka Agenda Hari Terpilih di atas Navbar (useRootNavigator: true) ─────
+  void _showDayAgendaSheet() {
+    final currentEvents = _events[_selectedDay] ?? [];
+    final todayTasks = _dueTasks.where((t) => t['dueDay'] == _selectedDay).toList();
 
-  // Tugas yang jatuh tempo (disinkronkan dari halaman Tasks)
-  final List<Map<String, dynamic>> _dueTasks = [
-    {
-      'id': 't1',
-      'title': 'Kirim Laporan Progres Praktikum Jarkom',
-      'workspace': 'Kuliah',
-      'matkul': 'Jaringan Komputer',
-      'priority': 'Tinggi',
-      'isDone': false,
-      'dueDay': 4,
-    },
-    {
-      'id': 't2',
-      'title': 'Selesaikan Bab 3 Analisis Algoritma',
-      'workspace': 'Kuliah',
-      'matkul': 'Struktur Data',
-      'priority': 'Sedang',
-      'isDone': true,
-      'dueDay': 4,
-    },
-    {
-      'id': 't3',
-      'title': 'Review PR Mockup Alexa Mobile',
-      'workspace': 'Tugas Harian',
-      'priority': 'Urgent',
-      'isDone': false,
-      'dueDay': 2,
-    },
-    {
-      'id': 't4',
-      'title': 'Push Commit Supabase Schema RLS',
-      'workspace': 'Tugas Harian',
-      'priority': 'Sedang',
-      'isDone': false,
-      'dueDay': 5,
-    },
-  ];
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true, // PENTING: Muncul di atas bottom navigation bar
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => DayAgendaBottomSheet(
+        selectedDay: _selectedDay,
+        monthName: 'Oktober',
+        year: 2026,
+        events: currentEvents,
+        dueTasks: todayTasks,
+        onAddEvent: _openAddOptionSheet,
+        onToggleTaskDone: (task) {
+          setState(() {
+            task['isDone'] = !(task['isDone'] as bool);
+          });
+        },
+      ),
+    );
+  }
 
-  final List<Map<String, dynamic>> _weekDays = [
-    {'num': '2', 'day': 'Mon'},
-    {'num': '3', 'day': 'Tue'},
-    {'num': '4', 'day': 'Wed'},
-    {'num': '5', 'day': 'Thu'},
-    {'num': '6', 'day': 'Fri'},
-    {'num': '7', 'day': 'Sat'},
-    {'num': '8', 'day': 'Sun'},
-  ];
+  // ─── Modal Pilihan Tambah: Pengingat vs Jadwal Acara ─────────────
+  void _openAddOptionSheet() {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true, // Muncul di atas navbar
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => CalendarAddActionSheet(
+        selectedDay: _selectedDay,
+        monthName: 'Okt',
+        onOptionSelected: (option) {
+          switch (option) {
+            case CalendarAddOption.reminder:
+              _openAddReminderScreen();
+              break;
+            case CalendarAddOption.scheduleEvent:
+              _openAddReminderScreen(); // Form acara & waktu
+              break;
+          }
+        },
+      ),
+    );
+  }
+
+  // ─── Form 1: Pengingat Baru (Samsung One UI) ──────────────────────────────
+  void _openAddReminderScreen() {
+    Navigator.of(context, rootNavigator: true).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 320),
+        pageBuilder: (context, anim, secondaryAnim) => SamsungReminderFormScreen(
+          initialDate: DateTime(_currentMonth.year, _currentMonth.month, _selectedDay),
+          onSave: (newEvent) {
+            setState(() {
+              final day = newEvent.date.day;
+              if (_events[day] != null) {
+                _events[day]!.insert(0, newEvent);
+              } else {
+                _events[day] = [newEvent];
+              }
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Pengingat "${newEvent.title}" disimpan ✓'),
+                backgroundColor: const Color(0xFF10B981),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+        ),
+        transitionsBuilder: (context, anim, secondaryAnim, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.08),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+            child: FadeTransition(opacity: anim, child: child),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,78 +186,197 @@ class _CalendarScreenState extends State<CalendarScreen>
       animation: _themeAnim,
       builder: (context, _) {
         final t = _themeAnim.value;
+        final isDark = t < 0.5;
+
+        final currentEvents = _events[_selectedDay] ?? [];
 
         return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: const Alignment(-0.8, -0.9),
-                end: const Alignment(0.9, 0.95),
-                colors: [
-                  Color.lerp(const Color(0xFF0C101C), const Color(0xFFD6E4F4), t)!,
-                  Color.lerp(const Color(0xFF111728), const Color(0xFFFDE8DC), t)!,
-                  Color.lerp(const Color(0xFF18152C), const Color(0xFFECE3F8), t)!,
-                  Color.lerp(const Color(0xFF0C111E), const Color(0xFFDCE7F7), t)!,
-                ],
-                stops: const [0.0, 0.38, 0.72, 1.0],
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    const CalendarTopHeader(),
-                    const SizedBox(height: 16),
-                    CalendarViewModeToggle(
-                      viewMode: _viewMode,
-                      onChanged: (mode) => setState(() => _viewMode = mode),
-                    ),
-                    const SizedBox(height: 18),
-                    if (_viewMode == CalendarViewMode.month) ...[
-                      MonthCalendarGrid(
-                        currentMonth: _currentMonth,
-                        selectedDay: _selectedDay,
-                        monthEvents: _monthEvents,
-                        onDaySelected: (day) => setState(() => _selectedDay = day),
+          backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
+          body: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                // ─── Top Bar: Bulan (OKT), Search, [ 13 ] ───────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 16, 6),
+                  child: Row(
+                    children: [
+                      // Bulan Kapital Tegas (OKT)
+                      Text(
+                        'OKT',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
                       ),
-                      const SizedBox(height: 22),
-                      VerticalTimelineScheduleSection(
-                        selectedDay: _selectedDay,
-                        headerTitle: 'Agenda $_selectedDay Juni 2026',
-                        events: _monthEvents[_selectedDay] ?? [],
-                        dueTasks: _dueTasks.where((t) => t['dueDay'] == _selectedDay).toList(),
-                        onToggleTaskDone: (task) {
-                          setState(() {
-                            task['isDone'] = !(task['isDone'] as bool);
-                          });
+                      const Spacer(),
+
+                      // Search Icon
+                      Icon(
+                        Icons.search_rounded,
+                        size: 24,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      const SizedBox(width: 14),
+
+                      // Shortcut Icon Tanggal Hari Ini [ 13 ] Khas Samsung
+                      GestureDetector(
+                        onTap: () {
+                          setState(() => _selectedDay = 13);
+                          _showDayAgendaSheet();
                         },
-                      ),
-                    ] else ...[
-                      WeekTimelineDateSection(
-                        selectedDay: _selectedDay,
-                        weekDays: _weekDays,
-                        onDaySelected: (day) => setState(() => _selectedDay = day),
-                      ),
-                      const SizedBox(height: 22),
-                      VerticalTimelineScheduleSection(
-                        selectedDay: _selectedDay,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isDark ? Colors.white70 : const Color(0xFF0F172A),
+                              width: 1.6,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '13',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
-                    const SizedBox(height: 110),
-                  ],
+                  ),
                 ),
-              ),
+
+                // ─── Grid Kalender Bulanan Samsung (Full Viewport) ───────────
+                Expanded(
+                  child: SamsungMonthGrid(
+                    currentMonth: _currentMonth,
+                    selectedDay: _selectedDay,
+                    events: _events,
+                    isDark: isDark,
+                    onDaySelected: (day) {
+                      final isSameDay = _selectedDay == day;
+                      setState(() => _selectedDay = day);
+
+                      // Ketuk tanggal -> langsung perbarui dan jika diketuk lagi atau ada event, buka agenda sheet
+                      if (isSameDay || (_events[day]?.isNotEmpty ?? false)) {
+                        _showDayAgendaSheet();
+                      }
+                    },
+                  ),
+                ),
+
+                // ─── Bottom Bar Samsung One UI (Tepat di Atas Navbar) ───────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 94), // 94dp: Aman di atas floating navbar
+                  child: Row(
+                    children: [
+                      // Kapsul Input Lonjong Khas Samsung
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (currentEvents.isNotEmpty) {
+                              _showDayAgendaSheet();
+                            } else {
+                              _openAddOptionSheet();
+                            }
+                          },
+                          child: Container(
+                            height: 52,
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF000000) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(26),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Tmbh acr pd $_selectedDay Okt',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                                if (currentEvents.isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3B82F6).withOpacity(0.18),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${currentEvents.length} Acara',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF3B82F6),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 3),
+                                        const Icon(
+                                          Icons.keyboard_arrow_up_rounded,
+                                          size: 14,
+                                          color: Color(0xFF3B82F6),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // Tombol Bulat Putih Besar (+) Sesuai Gambar 3
+                      GestureDetector(
+                        onTap: _openAddOptionSheet,
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.24),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.add_rounded,
+                              size: 32,
+                              color: Color(0xFF000000), // Plus hitam tebal khas Samsung
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          floatingActionButton: const CalendarAddFab(),
         );
       },
     );
