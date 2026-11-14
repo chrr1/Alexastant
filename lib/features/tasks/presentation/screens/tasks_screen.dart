@@ -319,29 +319,29 @@ class _TasksScreenState extends State<TasksScreen>
             : 35;
         final displayProgress = progressPercent == 0 ? 35 : progressPercent;
 
-        // ── Asymmetric Atmospheric Gradient ─────────────────────────────────
+        // ── Atmospheric Gradient ─────────────────────────────────
         final bgDecoration = BoxDecoration(
           gradient: LinearGradient(
             begin: const Alignment(-1.0, -1.0),
             end: const Alignment(1.0, 0.9),
             colors: [
               Color.lerp(
-                const Color(0xFF080F1E),
+                const Color(0xFF0B0B0E),
                 const Color(0xFF5D8FA8),
                 t,
               )!,
               Color.lerp(
-                const Color(0xFF0C1628),
+                const Color(0xFF0F0F14),
                 const Color(0xFF50689C),
                 t,
               )!,
               Color.lerp(
-                const Color(0xFF14243F),
+                const Color(0xFF161619),
                 const Color(0xFFD6E2E9),
                 t,
               )!,
               Color.lerp(
-                const Color(0xFF090D17),
+                Colors.white,
                 Colors.white,
                 t,
               )!,
@@ -350,16 +350,13 @@ class _TasksScreenState extends State<TasksScreen>
           ),
         );
 
-        // Date string calculation
+        // Date calculations for week strip
         final selectedDay = _weekDays[_selectedDayIndex];
         const monthNames = [
           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         ];
-        const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        final dayName = dayNames[_selectedDayIndex];
         final monthName = monthNames[selectedDay.date.month - 1];
-        final dateText = '$dayName, $monthName ${selectedDay.dateNumber}';
 
         // Week range text
         final firstDate = _weekDays.first.dateNumber;
@@ -382,11 +379,9 @@ class _TasksScreenState extends State<TasksScreen>
                         children: [
                           const SizedBox(height: 14),
 
-                          // ─── 1. Header Luar: Today & Date + Add Button
+                          // ─── 1. Header: Add Button only
                           MinimalTaskHeader(
                             isDark: isDark,
-                            dateText: dateText,
-                            progressPercent: displayProgress,
                             onAddTask: _openCreateTaskModal,
                           ),
 

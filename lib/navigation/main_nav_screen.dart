@@ -4,8 +4,8 @@ import '../core/theme/theme_controller.dart';
 import '../features/home/presentation/screens/minimal_editorial_home_screen.dart';
 import '../features/tasks/presentation/screens/tasks_screen.dart';
 import '../features/calendar/presentation/screens/calendar_screen.dart';
-import '../features/notes/presentation/screens/notes_screen.dart';
 import '../features/voice/presentation/screens/alexa_chat_screen.dart';
+import '../features/voice/presentation/screens/voice_conversation_screen.dart';
 
 class MainNavScreen extends StatefulWidget {
   const MainNavScreen({super.key});
@@ -16,7 +16,7 @@ class MainNavScreen extends StatefulWidget {
 
 class _MainNavScreenState extends State<MainNavScreen>
     with TickerProviderStateMixin {
-  // 0: Home, 1: Tasks, 2: Calendar, 3: Notes, 4: Voice AI (Chat)
+  // 0: Home, 1: Tasks, 2: Calendar, 3: AI Chat
   int _currentIndex = 0;
 
   // ── Theme animation ────────────────────────────────────────────────────────
@@ -76,13 +76,11 @@ class _MainNavScreenState extends State<MainNavScreen>
     super.dispose();
   }
 
-  // 0: Home, 1: Tasks, 2: Calendar, 3: Notes, 4: Voice AI
+  // 0: Home, 1: Tasks, 2: Calendar
   final List<Widget> _screens = const [
     MinimalEditorialHomeScreen(),
     TasksScreen(),
     CalendarScreen(),
-    NotesScreen(),
-    AlexaChatScreen(),
   ];
 
   @override
@@ -193,7 +191,7 @@ class _MainNavScreenState extends State<MainNavScreen>
     required Color accentOrange,
     required double pulse,
   }) {
-    final isVoiceActive = _currentIndex == 4;
+    final bool isVoiceActive = false; // Voice screen is now a separate page
 
     return SafeArea(
       child: Padding(
@@ -202,7 +200,7 @@ class _MainNavScreenState extends State<MainNavScreen>
           height: 64,
           child: Row(
             children: [
-              // 1. Kapsul Navigasi Utama (Home, Tasks, Calendar, Notes)
+              // 1. Kapsul Navigasi Utama (Home, Tasks, Calendar, AI)
               Expanded(
                 child: Container(
                   height: 62,
@@ -247,14 +245,6 @@ class _MainNavScreenState extends State<MainNavScreen>
                         activeIconColor: activeIconColor,
                         inactiveIconColor: inactiveIconColor,
                       ),
-                      _buildPillNavItem(
-                        index: 3,
-                        activeIcon: Icons.sticky_note_2_rounded,
-                        inactiveIcon: Icons.sticky_note_2_outlined,
-                        activeItemBg: activeItemBg,
-                        activeIconColor: activeIconColor,
-                        inactiveIconColor: inactiveIconColor,
-                      ),
                     ],
                   ),
                 ),
@@ -264,7 +254,14 @@ class _MainNavScreenState extends State<MainNavScreen>
 
               // 2. Tombol Bulat Terpisah untuk Alexa Voice AI
               GestureDetector(
-                onTap: () => setState(() => _currentIndex = 4),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const VoiceConversationScreen(),
+                    ),
+                  );
+                },
                 behavior: HitTestBehavior.opaque,
                 child: SizedBox(
                   width: 62,
