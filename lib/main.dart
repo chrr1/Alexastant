@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/auth/presentation/screens/onboarding_welcome_screen.dart';
 import 'navigation/main_nav_screen.dart';
 
 void main() {
@@ -75,7 +76,23 @@ class _AlexaAppState extends State<AlexaApp> {
           child: child!,
         );
       },
-      home: const MainNavScreen(),
+      home: Builder(
+        builder: (context) => OnboardingWelcomeScreen(
+          assetMediaPath: 'assets/onboarding_gif.gif',
+          onGetStarted: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainNavScreen()),
+            );
+          },
+          onLogin: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainNavScreen()),
+            );
+          },
+        ),
+      ),
     );
   }
 }

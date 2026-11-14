@@ -123,7 +123,13 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
       return Container(
         height: _cardHeight,
         alignment: Alignment.center,
-        child: const Text('Tidak ada tugas untuk hari ini'),
+        child: Text(
+          'Tidak ada tugas untuk hari ini',
+          style: TextStyle(
+            color: widget.isDark ? Colors.white70 : const Color(0xFF64748B),
+            fontSize: 14,
+          ),
+        ),
       );
     }
 
@@ -262,24 +268,54 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
       deadlineLabel = 'Tenggat $dueTimeString WIB';
     }
 
+    final isDark = widget.isDark;
     final categoryLabel = task.matkul ?? task.workspace;
+
+    // Theme & Glassmorphism Colors
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final descColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569);
+    final focusLabelColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final categoryTextColor = isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155);
+    final actionBtnBg = isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFF1F5F9).withOpacity(0.85);
+    final actionIconColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final checklistLabelColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    final isAllDone = task.doneSubtasksCount == task.totalSubtasksCount && task.totalSubtasksCount > 0;
+    final pillCounterBg = isDark
+        ? (isAllDone
+            ? const Color(0xFF065F46).withOpacity(0.4)
+            : Colors.white.withOpacity(0.08))
+        : (isAllDone
+            ? const Color(0xFFECFDF5)
+            : const Color(0xFFF1F5F9).withOpacity(0.85));
+    final pillCounterTextColor = isDark
+        ? (isAllDone ? const Color(0xFF34D399) : const Color(0xFF94A3B8))
+        : (isAllDone ? const Color(0xFF059669) : const Color(0xFF475569));
+
+    final counterPillBg = isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFF1F5F9).withOpacity(0.85);
+    final counterPillTextColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
 
     return Container(
       height: _cardHeight,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       decoration: BoxDecoration(
-        color: isFront ? Colors.white : const Color(0xFFF8FAFC),
+        color: isDark
+            ? (isFront ? const Color(0xFF1E212B) : const Color(0xFF161820))
+            : (isFront ? Colors.white : const Color(0xFFF8FAFC)),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isFront ? Colors.transparent : Colors.white.withOpacity(0.9),
+          color: isDark
+              ? Colors.white.withOpacity(isFront ? 0.08 : 0.04)
+              : (isFront ? Colors.transparent : Colors.white.withOpacity(0.9)),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(isFront ? 0.08 : 0.05),
-            blurRadius: isFront ? 20 : 12,
-            offset: Offset(0, isFront ? 6 : -3), // -3 membuat bayangan mengintip di atas
+            color: (isDark ? Colors.black : const Color(0xFF1E293B))
+                .withOpacity(isFront ? 0.08 : 0.04),
+            blurRadius: isFront ? 18 : 10,
+            offset: Offset(0, isFront ? 6 : -3), // bayangan kartu mengintip
           ),
         ],
       ),
@@ -297,26 +333,29 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                   spacing: 8,
                   runSpacing: 4,
                   children: [
-                    const Text(
+                    Text(
                       "Today's focus",
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF64748B),
+                        color: focusLabelColor,
                         letterSpacing: -0.1,
                       ),
                     ),
                     if (categoryLabel.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         "•",
-                        style: TextStyle(fontSize: 12, color: Color(0xFFCBD5E1)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                        ),
                       ),
                       Text(
                         categoryLabel,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF334155),
+                          color: categoryTextColor,
                           letterSpacing: -0.1,
                         ),
                       ),
@@ -347,11 +386,11 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                   width: 28,
                   height: 28,
                   margin: const EdgeInsets.only(right: 8),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFFF1F5F9),
+                    color: actionBtnBg,
                   ),
-                  child: const Icon(Icons.more_horiz_rounded, size: 17, color: Color(0xFF64748B)),
+                  child: Icon(Icons.more_horiz_rounded, size: 17, color: actionIconColor),
                 ),
               ),
 
@@ -365,11 +404,11 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                     shape: BoxShape.circle,
                     color: task.status == TaskStatus.completed
                         ? const Color(0xFF10B981)
-                        : const Color(0xFFF1F5F9),
+                        : actionBtnBg,
                     border: Border.all(
                       color: task.status == TaskStatus.completed
                           ? const Color(0xFF10B981)
-                          : const Color(0xFFCBD5E1),
+                          : (isDark ? Colors.white.withOpacity(0.2) : const Color(0xFFCBD5E1)),
                       width: 1.5,
                     ),
                   ),
@@ -390,10 +429,10 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
             task.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: titleColor,
               height: 1.25,
               letterSpacing: -0.4,
             ),
@@ -403,10 +442,10 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
             const SizedBox(height: 6),
             Text(
               task.description!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF64748B),
+                color: descColor,
                 height: 1.4,
               ),
             ),
@@ -435,13 +474,13 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              const Text(
+                              Text(
                                 'CHECKLIST',
                                 style: TextStyle(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.8,
-                                  color: Color(0xFF64748B),
+                                  color: checklistLabelColor,
                                 ),
                               ),
                             ],
@@ -449,9 +488,7 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: task.doneSubtasksCount == task.totalSubtasksCount && task.totalSubtasksCount > 0
-                                  ? const Color(0xFFECFDF5)
-                                  : const Color(0xFFF1F5F9),
+                              color: pillCounterBg,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -459,9 +496,7 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                               style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w600,
-                                color: task.doneSubtasksCount == task.totalSubtasksCount && task.totalSubtasksCount > 0
-                                    ? const Color(0xFF059669)
-                                    : const Color(0xFF475569),
+                                color: pillCounterTextColor,
                               ),
                             ),
                           ),
@@ -480,25 +515,33 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                             final subtask = task.subtasks[idx];
                             final isDone = subtask.isCompleted;
 
+                            final subtaskTileBg = isDone
+                                ? (isDark ? const Color(0xFF1B1D25) : const Color(0xFFF8FAFC))
+                                : (isDark ? const Color(0xFF262A36) : Colors.white);
+
+                            final subtaskBorder = Border.all(
+                              color: isDone
+                                  ? (isDark ? Colors.white.withOpacity(0.04) : const Color(0xFFE2E8F0))
+                                  : (isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFE2E8F0)),
+                              width: 1,
+                            );
+
+                            final subtaskTextColor = isDone
+                                ? (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8))
+                                : (isDark ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B));
+
                             return Container(
                               decoration: BoxDecoration(
-                                color: isDone
-                                    ? const Color(0xFFF8FAFC).withOpacity(0.8)
-                                    : Colors.white,
+                                color: subtaskTileBg,
                                 borderRadius: BorderRadius.circular(13),
-                                border: Border.all(
-                                  color: isDone
-                                      ? const Color(0xFFE2E8F0).withOpacity(0.6)
-                                      : const Color(0xFFE2E8F0),
-                                  width: 1,
-                                ),
+                                border: subtaskBorder,
                                 boxShadow: isDone
                                     ? null
-                                    : const [
+                                    : [
                                         BoxShadow(
-                                          color: Color(0x060F172A),
+                                          color: isDark ? Colors.black.withOpacity(0.12) : const Color(0x060F172A),
                                           blurRadius: 6,
-                                          offset: Offset(0, 2),
+                                          offset: const Offset(0, 2),
                                         ),
                                       ],
                               ),
@@ -520,12 +563,12 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                                           decoration: BoxDecoration(
                                             color: isDone
                                                 ? const Color(0xFF10B981)
-                                                : const Color(0xFFF8FAFC),
+                                                : (isDark ? Colors.white.withOpacity(0.06) : const Color(0xFFF8FAFC)),
                                             borderRadius: BorderRadius.circular(6),
                                             border: Border.all(
                                               color: isDone
                                                   ? const Color(0xFF10B981)
-                                                  : const Color(0xFFCBD5E1),
+                                                  : (isDark ? Colors.white.withOpacity(0.20) : const Color(0xFFCBD5E1)),
                                               width: 1.4,
                                             ),
                                           ),
@@ -547,11 +590,9 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                                               fontSize: 12.5,
                                               fontWeight: isDone ? FontWeight.w400 : FontWeight.w500,
                                               height: 1.35,
-                                              color: isDone
-                                                  ? const Color(0xFF94A3B8)
-                                                  : const Color(0xFF1E293B),
+                                              color: subtaskTextColor,
                                               decoration: isDone ? TextDecoration.lineThrough : null,
-                                              decorationColor: const Color(0xFF94A3B8),
+                                              decorationColor: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                                             ),
                                           ),
                                         ),
@@ -579,9 +620,15 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF2F2),
+                    color: isDark
+                        ? const Color(0xFFEF4444).withOpacity(0.16)
+                        : const Color(0xFFFEF2F2).withOpacity(0.9),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFFECACA)),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFFEF4444).withOpacity(0.35)
+                          : const Color(0xFFFECACA),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -593,10 +640,10 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                           deadlineLabel,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFFB91C1C),
+                            color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
                           ),
                         ),
                       ),
@@ -612,7 +659,7 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: counterPillBg,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -620,14 +667,14 @@ class _StackedTaskCardsSliderState extends State<StackedTaskCardsSlider>
                     children: [
                       Text(
                         '${taskIndex + 1}/${widget.tasks.length}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF475569),
+                          color: counterPillTextColor,
                         ),
                       ),
                       const SizedBox(width: 3),
-                      const Icon(Icons.chevron_right_rounded, size: 14, color: Color(0xFF475569)),
+                      Icon(Icons.chevron_right_rounded, size: 14, color: counterPillTextColor),
                     ],
                   ),
                 ),

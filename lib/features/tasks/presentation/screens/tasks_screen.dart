@@ -320,35 +320,36 @@ class _TasksScreenState extends State<TasksScreen>
         final displayProgress = progressPercent == 0 ? 35 : progressPercent;
 
         // ── Atmospheric Gradient ─────────────────────────────────
-        final bgDecoration = BoxDecoration(
-          gradient: LinearGradient(
-            begin: const Alignment(-1.0, -1.0),
-            end: const Alignment(1.0, 0.9),
-            colors: [
-              Color.lerp(
-                const Color(0xFF0B0B0E),
-                const Color(0xFF5D8FA8),
-                t,
-              )!,
-              Color.lerp(
-                const Color(0xFF0F0F14),
-                const Color(0xFF50689C),
-                t,
-              )!,
-              Color.lerp(
-                const Color(0xFF161619),
-                const Color(0xFFD6E2E9),
-                t,
-              )!,
-              Color.lerp(
-                Colors.white,
-                Colors.white,
-                t,
-              )!,
-            ],
-            stops: const [0.0, 0.38, 0.68, 1.0],
-          ),
-        );
+        
+final bgDecoration = BoxDecoration(
+  gradient: LinearGradient(
+    begin: const Alignment(-1.0, -1.0),
+    end: const Alignment(1.0, 0.9),
+    colors: [
+      Color.lerp(
+        const Color(0xFF080A12),
+        const Color(0xFF6899AD),
+        t,
+      )!,
+      Color.lerp(
+        const Color(0xFF17213A),
+        const Color(0xFF657DAF),
+        t,
+      )!,
+      Color.lerp(
+        const Color(0xFF526FAF),
+        const Color(0xFFD6E2EC),
+        t,
+      )!,
+      Color.lerp(
+        const Color(0xFFF0EFF4),
+        const Color(0xFFF4F3F6),
+        t,
+      )!,
+    ],
+    stops: const [0.0, 0.38, 0.68, 1.0],
+  ),
+);
 
         // Date calculations for week strip
         final selectedDay = _weekDays[_selectedDayIndex];
